@@ -1,0 +1,26 @@
+<div class="container">
+    <ul class="nav nav-pills">
+        <li role="presentation"><a href="/">Packages</a></li>
+        <li role="presentation"><a href="/burgers">Burgers</a></li>
+        <li role="presentation"><a href="/snacks">Snacks</a></li>
+        <li role="presentation"><a href="/desserts">Desserts</a></li>
+        <li role="presentation" class="active"><a href="/beverages">Beverages</a></li>
+    </ul>
+</div>
+<br>
+
+{{#each beverages }}
+    <div class="col-sm-6 col-md-4">
+        <div class="thumbnail my-thumbnail">
+            <img src="{{this.image_path}}" class="image-responsive" alt="...">
+            <div class="caption">
+                <h3>{{this.name}}</h3>
+                <div class="clearfix">
+                    <div class="price pull-left">Rs.{{this.price}}/=</div>
+                    <a href="/add-to-cart/{{this.id}}/beverage" class="btn btn-success pull-right" role="button">Add to cart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{{/each}}

@@ -1,0 +1,27 @@
+.thumbnail img{
+    max-height: 150px;
+}
+
+.description{
+    color: #7f7f7f;
+}
+
+.price{
+    font-weight: bold;
+    font-weight: 16px;
+   // color: white;
+}
+/*
+.my-thumbnail{
+    border: 0px;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.thumbnail h3{
+    color: white;
+}
+
+body{
+    background: url(/images/background.png) no-repeat center fixed;
+    background-size: cover;
+}*/
