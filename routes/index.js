@@ -21,7 +21,7 @@ router.get('/', function(req, res, next) {
 router.get('/burgers', function (req, res, next) {
   req.getConnection(function (err, conn) {
     conn.query('select id from categories where name = ?', ['Burgers'], function (err, id) {
-      conn.query('select * from food_items where category_id = ?', [id[0].id] ,function (err, burgers) {
+      conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, burgers) {
         if(burgers){
           res.render('shop/burgers', {burgers: burgers});
         }
@@ -33,7 +33,7 @@ router.get('/burgers', function (req, res, next) {
 router.get('/snacks', function (req, res, next) {
   req.getConnection(function (err, conn) {
     conn.query('select id from categories where name = ?', ['Snacks'], function (err, id) {
-      conn.query('select * from food_items where category_id = ?', [id[0].id] ,function (err, snacks) {
+      conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, snacks) {
         if(snacks){
           res.render('shop/snacks', {snacks: snacks});
         }
@@ -45,7 +45,7 @@ router.get('/snacks', function (req, res, next) {
 router.get('/desserts', function (req, res, next) {
   req.getConnection(function (err, conn) {
     conn.query('select id from categories where name = ?', ['Desserts'], function (err, id) {
-      conn.query('select * from food_items where category_id = ?', [id[0].id] ,function (err, desserts) {
+      conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, desserts) {
         if(desserts){
           res.render('shop/desserts', {desserts: desserts});
         }
@@ -57,7 +57,7 @@ router.get('/desserts', function (req, res, next) {
 router.get('/beverages', function (req, res, next) {
   req.getConnection(function (err, conn) {
     conn.query('select id from categories where name = ?', ['Beverages'], function (err, id) {
-      conn.query('select * from food_items where category_id = ?', [id[0].id] ,function (err, beverages) {
+      conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, beverages) {
         if(beverages){
           res.render('shop/beverages', {beverages: beverages});
         }
