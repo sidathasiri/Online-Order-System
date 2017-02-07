@@ -100,6 +100,33 @@ router.post('/addNewCategory', function (req, res, next) {
 });
 
 router.post('/addNewFood',function (req, res, next) {
+    req.checkBody('itemName', 'Item name should not be empty').notEmpty();
+    req.checkBody('price', 'Price is invalid').notEmpty().isNumeric();
+
+    var errors = req.validationErrors();
+    if(errors){
+        var messages = [];
+        errors.forEach(function (error) {
+            messages.push(error.msg);
+        });
+
+        req.flash('error', messages);
+        res.redirect('/admin/addFood');
+    }
+
+    else{
+        var catName = req.body.category;
+        req.getConnection(function (err, conn) {
+            conn.query('select id from categories where name = ?', [catName], function (err, id) {
+                conn.query('insert into food_items (name, price, category_id, image_path) values(?,?,?,?)', [req.body.itemName, req.body.price, id[0].id, req.file.path], function (err, result) {
+                    if(err)
+                        console.log(err);
+                    res.redirect('/admin/addFood');
+                });
+            });
+        });
+    }
+
 
     console.log('in route');
     console.log(req.body);
