@@ -23,6 +23,9 @@ router.get('/burgers', function (req, res, next) {
     conn.query('select id from categories where name = ?', ['Burgers'], function (err, id) {
       conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, burgers) {
         if(burgers){
+            burgers.forEach(function (burger) {
+               burger.image_path = burger.image_path.substr(7);
+            });
           res.render('shop/burgers', {burgers: burgers});
         }
     });
@@ -35,6 +38,9 @@ router.get('/snacks', function (req, res, next) {
     conn.query('select id from categories where name = ?', ['Snacks'], function (err, id) {
       conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, snacks) {
         if(snacks){
+            snacks.forEach(function (snack) {
+                snack.image_path = snack.image_path.substr(7);
+            });
           res.render('shop/snacks', {snacks: snacks});
         }
       });
@@ -47,6 +53,9 @@ router.get('/desserts', function (req, res, next) {
     conn.query('select id from categories where name = ?', ['Desserts'], function (err, id) {
       conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, desserts) {
         if(desserts){
+            desserts.forEach(function (dessert) {
+                dessert.image_path = dessert.image_path.substr(7);
+            });
           res.render('shop/desserts', {desserts: desserts});
         }
       });
@@ -59,6 +68,9 @@ router.get('/beverages', function (req, res, next) {
     conn.query('select id from categories where name = ?', ['Beverages'], function (err, id) {
       conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, beverages) {
         if(beverages){
+            beverages.forEach(function (beverage) {
+                beverage.image_path = beverage.image_path.substr(7);
+            });
           res.render('shop/beverages', {beverages: beverages});
         }
       });
