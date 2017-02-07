@@ -6,8 +6,20 @@ var Cart = require('../Models/cart');
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var bodyParser = require('body-parser');
+
+var storage = multer.diskStorage({
+    destination: function(req, file, cb){
+        cb(null, './public/uploads');
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + file.originalname);
+    }
+});
+
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
+
+router.use(multer({storage: storage}).single('fileUpload'));
 
 var csrfProtection = csrf();
 router.use(csrfProtection);
@@ -36,7 +48,6 @@ router.get('/addFood', function (req, res, next) {
             });
             var messages = req.flash('addCat');
             var errors = req.flash('error');
-            console.log(messages[0]);
             res.render('admin/addFood', {names: names, csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length>0, errors: errors, hasValidationErrors: errors.length>0});
         });
     });
@@ -88,31 +99,11 @@ router.post('/addNewCategory', function (req, res, next) {
     });
 });
 
-router.post('/addNewFood', upload.single('fileUpload'),function (req, res, next) {
-    req.checkBody('itemName', 'Item name should not be empty').notEmpty();
-    req.checkBody('price', 'Price is invalid').notEmpty().isNumeric();
+router.post('/addNewFood',function (req, res, next) {
 
-    var errors = req.validationErrors();
-    if(errors){
-        var messages = [];
-        errors.forEach(function (error) {
-            messages.push(error.msg);
-        });
-
-        req.flash('error', messages);
-        res.redirect('/admin/addFood');
-    }
-
-    else{
-        var catName = req.body.category;
-        req.getConnection(function (err, conn) {
-            conn.query('select id from categories where name = ?', [catName], function (err, id) {
-                conn.query('insert into food_items (name, price, category_id) values(?,?,?)', [req.body.itemName, req.body.price, id[0].id], function (err, result) {
-                    res.redirect('/admin/addFood');
-                });
-            });
-        });
-    }
+    console.log('in route');
+    console.log(req.body);
+    console.log(req.file);
 
 });
 

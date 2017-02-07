@@ -53,7 +53,7 @@
             </form>
         </div>
 
-        <form class="form-horizontal" action="/admin/addNewFood" method="post">
+        <form class="form-horizontal" action="/admin/addNewFood" enctype='multipart/form-data' method="post">
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">Item Name</label>
                 <div class="col-sm-3">
@@ -82,9 +82,8 @@
             <div class="form-group">
                 <label for="image" class="col-sm-2 control-label">Choose Image</label>
                 <div class="col-sm-3">
-                                <span class="btn btn-default btn-file btn-xs">
-                                    Browse <input type="file" name="fileUpload">
-                                </span>
+                                 <input type="file" name="fileUpload">
+
                 </div>
 
             </div>
