@@ -33,6 +33,7 @@ router.get('/adminDashboard', function (req, res, next) {
                 order.items = cart.generateArray();
                 order.cart = JSON.parse(order.cart);
             });
+            console.log(req.csrfToken());
             res.render('admin/adminDashboard', {orders: orders});
         });
     });
@@ -128,10 +129,6 @@ router.post('/addNewFood',function (req, res, next) {
     }
 
 
-    console.log('in route');
-    console.log(req.body);
-    console.log(req.file);
-
 });
 
 router.get('/loadItems/:id', function (req, res, next) {
@@ -160,6 +157,30 @@ router.get('/getPrice/:id', function (req, res, next) {
           res.send(price[0]);
       });
    });
+});
+
+router.get('/sendCompletedMail/:customer_id', function (req, res, next) {
+    var customer_id = req.params.customer_id;
+    var api_key = 'key-a5c0a552c662ece5f3c279eec081b3f9';
+    var domain = 'sandboxbd57df4272094073a1546c209403a45b.mailgun.org';
+    var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
+
+    req.getConnection(function (err, conn) {
+       conn.query('select email from users where id=?', [customer_id], function (err, email) {
+
+           var data = {
+               from: 'EasyFoods <postmaster@sandboxbd57df4272094073a1546c209403a45b.mailgun.org>',
+               to: email[0].email,
+               subject: 'Order is on the way',
+               text: 'We just shipped your order and will reach you soon. Thanks for using our web app!'
+           };
+
+           mailgun.messages().send(data, function (error, body) {
+               res.redirect('/admin/adminDashboard');
+           });
+       });
+    });
+
 });
 
 

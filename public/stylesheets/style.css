@@ -11,6 +11,20 @@
     font-weight: 16px;
    // color: white;
 }
+
+#linkBtn{
+    color: white;
+}
+
+#linkBtn:hover{
+    text-decoration: none;
+}
+
+#linkBtn:visited{
+    color:white;
+}
+
+
 /*
 .my-thumbnail{
     border: 0px;
