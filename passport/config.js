@@ -30,6 +30,7 @@ passport.use('local.signup', new LocalStrategy({
     function(req, email, password, done) {
         req.checkBody('email', 'Invalid email').notEmpty().isEmail();
         req.checkBody('password', 'Password too short').notEmpty().isLength({min:4});
+        req.checkBody('name', 'Name should be given').notEmpty();
         var errors = req.validationErrors();
         if(errors){
             var messages = [];
@@ -61,7 +62,7 @@ passport.use('local.signup', new LocalStrategy({
 
                // var insertQuery = "INSERT INTO users ( email, password, post ) values ('" + email +"','"+ password +"','"+ password +"')";
                // console.log(insertQuery);
-                connection.query('insert into users (email, password, post) values (?,?,?)',[email, hash, 'customer'],function(err,rows){
+                connection.query('insert into users (email, password, post, name) values (?,?,?,?)',[email, hash, 'customer', req.body.name],function(err,rows){
                     newUserMysql.id = rows.insertId;
 
                     return done(null, newUserMysql);
