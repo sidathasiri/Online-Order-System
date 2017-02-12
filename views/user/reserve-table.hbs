@@ -13,5 +13,120 @@
     <div class="col-md-8">
         <h1>Reserve Tables</h1>
         <hr>
+
+        <form action="#" method="post">
+            <div class="row">
+                <h3>Step 1</h3>
+                <br>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="capacity">Select capacity:</label>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="capacity">
+
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <h3>Step 2</h3>
+                <br>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="capacity">Select table:</label>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="tableData">
+
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <strong><p id="priceTag"></p></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <h3>Step 3</h3>
+                <br>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="capacity">Select time:</label>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="sel1">
+                                <option>7.00</option>
+                                <option>8.00</option>
+                                <option>9.00</option>
+                                <option>10.00</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <br>
+                <div class="col-sm-offset-4 col-sm-10">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                    <button type="submit" class="btn btn-primary">Reserve</button>
+                </div>
+        </form>
+
+
     </div>
 </div>
+
+<script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous"></script>
+
+<script>
+    $(document).ready(function () {
+        $.get('/user/loadCapacity', function (data) {
+            $.each(data, function (index, cap) {
+                $('#capacity').append('<option value="'+cap+'">'+cap+'</option>')
+            });
+
+            $.get('/user/loadTable/'+$('#capacity').val(), function (data) {
+                $('#tableData').empty();
+                $.each(data, function (index, cap) {
+                    $('#tableData').append('<option value="'+cap.table_no+'">'+cap.table_no+'</option>')
+                });
+            });
+
+
+        });
+
+
+
+        $('#capacity').on('change', function () {
+            $.get('/user/loadTable/'+$('#capacity').val(), function (data) {
+                $('#tableData').empty();
+                $.each(data, function (index, cap) {
+                    $('#tableData').append('<option value="'+cap.table_no+'">'+cap.table_no+'</option>')
+                });
+            });
+
+            $.get('/user/loadPrice/'+$('#tableData').val(), function (data) {
+                $('#priceTag').text('Price:'+data[0].price);
+            });
+
+        });
+
+        $('#tableData').on('change', function () {
+            $.get('/user/loadPrice/'+$('#tableData').val(), function (data) {
+                $('#priceTag').text('Price:'+data[0].price);
+            });
+        });
+
+    });
+</script>

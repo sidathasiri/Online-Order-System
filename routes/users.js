@@ -39,7 +39,7 @@ router.get('/profile', isLoggedin,function (req, res, next) {
         order.cart = JSON.parse(order.cart);
       });
       if(req.user.post=='customer')
-        res.render('user/profile', {orders: orders});
+        res.render('user/profile', {orders: orders, name: req.user.name});
       else
         res.redirect('/admin/adminDashboard');
     });
@@ -99,6 +99,42 @@ router.post('/changeEmail', function (req, res, next) {
             });
         });
     }
+});
+
+router.get('/loadCapacity', function (req, res, next) {
+   req.getConnection(function (err, conn) {
+     conn.query('select distinct capacity from tables', function (err, capacities) {
+         var capacitityArr = [];
+         capacities.forEach(function (cap) {
+            capacitityArr.push(cap.capacity);
+         });
+        res.send(capacitityArr);
+     });
+   });
+});
+
+router.get('/loadTable/:capacity', function (req, res, next) {
+   var capacity = req.params.capacity;
+    req.getConnection(function (err, conn) {
+       conn.query('select * from tables where capacity = ?', [capacity], function (err, tables) {
+           var tableArr = [];
+           tables.forEach(function (table) {
+               tableArr.push(table);
+           });
+           res.send(tableArr);
+       });
+    });
+});
+
+router.get('/loadPrice/:id', function (req, res, next) {
+    var id = req.params.id;
+    req.getConnection(function (err, conn) {
+        conn.query('select price from tables where table_no = ?', [id], function (err, price) {
+            console.log(price);
+            res.send(price);
+        });
+    });
+
 });
 
 module.exports = router;

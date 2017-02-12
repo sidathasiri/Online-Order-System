@@ -226,10 +226,6 @@ router.post('/checkout', isLoggedin,function(req, res, next){
   });
 });
 
-
-
-
-
 module.exports = router;
 
 function isLoggedin(req, res, next){
