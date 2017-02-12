@@ -137,6 +137,63 @@ router.get('/loadPrice/:id', function (req, res, next) {
 
 });
 
+router.get('/loadTimeSolts/:tableId', function (req, res, next) {
+   var tableId = req.params.tableId;
+    var timeSlotsArr = [];
+    req.getConnection(function (err, conn) {
+        conn.query('select time from time_slots', function (err, timeSlots) {
+            timeSlots.forEach(function (timeSlot) {
+                timeSlotsArr.push(timeSlot.time);
+            });
+
+            var timeIdArr = [];
+            req.getConnection(function (err, conn) {
+                conn.query('select time_slot_id from table_reservations where table_id = ?  and status = ?', [tableId, 'active'], function (err, timeIds) {
+                    if(timeIds.length>0){
+                        timeIds.forEach(function (id) {
+                            timeIdArr.push(id.time_slot_id);
+                        });
+
+                        var takenSlots = [];
+                        timeIdArr.forEach(function (id) {
+                            req.getConnection(function (err, conn) {
+                                conn.query('select time from time_slots where id = ?', [id], function (err, times) {
+                                    times.forEach(function (slot) {
+                                        takenSlots.push(slot.time);
+                                    });
+
+                                    if(takenSlots.length==timeIds.length){
+                                        let difference = timeSlotsArr.filter(x => takenSlots.indexOf(x) == -1);
+                                        console.log(difference);
+                                        res.send(difference);
+                                    }
+
+                                });
+                            });
+                        });
+                    }else{
+                        res.send(timeSlotsArr);
+                    }
+                });
+            });
+
+
+
+
+        });
+
+
+
+
+
+
+
+    });
+
+
+
+});
+
 module.exports = router;
 
 function isLoggedin(req, res, next){
