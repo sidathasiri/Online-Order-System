@@ -1,0 +1,72 @@
+<div class="col-md-3 pull-left" >
+    <div class="list-group">
+        <a href="/admin/adminDashboard" class="list-group-item ">
+            View orders
+        </a>
+        <a href="/admin/tableReservations" class="list-group-item active">View Table Reservations</a>
+        <a href="/admin/addFood" class="list-group-item ">Add Food items</a>
+        <a href="/admin/setAvailableFood" class="list-group-item ">Set today available food</a>
+        <a href="/admin/myOrders" class="list-group-item">My orders</a>
+
+    </div>
+</div>
+
+<div class="col-md-8">
+    <div class="page-header">
+        <h1>Table Reservations</h1>
+    </div>
+
+    {{#if isAvailable}}
+        <table class="table table-hover">
+            <thead>
+            <td>Table No</td>
+            <td>Customer Name</td>
+            <td>Time</td>
+            <td>Requested on</td>
+            <td>Action</td>
+            </thead>
+
+        <tbody>
+        {{#each reservations}}
+            <tr>
+                <td>{{this.[0]}}</td>
+                <td>{{this.[3]}}</td>
+                <td>{{this.[2]}}</td>
+                <td>{{this.[1]}}</td>
+                <td><button id="{{this.[4]}}" class="btn btn-xs btn-danger">Cancel</button></td>
+            </tr>
+
+        {{/each}}
+            </tbody>
+            </table>
+
+            {{else}}
+            <h3>No table reservations</h3>
+    {{/if}}
+
+</div>
+
+<script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous">
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('button').on('click', function () {
+            $.get('/user/cancelReservation/'+$(this).attr('id'), function (data) {
+                location.reload();
+            });
+
+        });
+    });
+</script>
+
+
+
+
+
+
+

@@ -183,6 +183,43 @@ router.get('/sendCompletedMail/:customer_id', function (req, res, next) {
 
 });
 
+router.get('/tableReservations', function (req, res,next) {
+    var reservationsArr = [];
+    req.getConnection(function (err, conn) {
+       conn.query('select * from table_reservations where status = ?', ['active'], function (err ,reservations) {
+           console.log(reservations);
+          if(reservations.length>0){
+              reservations.forEach(function (reservation) {
+                  var temp = [];
+                  temp.push(reservation.table_id);
+                  temp.push(reservation.createdOn);
+                  console.log(reservation.time_slot_id);
+                  req.getConnection(function (err, conn) {
+                      conn.query('select time from time_slots where id = ?', reservation.time_slot_id, function (err, times) {
+                          console.log(times);
+                          temp.push(times[0].time);
+                          req.getConnection(function (err, conn) {
+                              conn.query('select name from users where id = ?', [reservation.user_id], function (err, names) {
+                                  temp.push(names[0].name);
+                                  temp.push(reservation.id);
+                                  reservationsArr.push(temp);
+                                  if(reservationsArr.length==reservations.length){
+                                      console.log(reservationsArr);
+                                      res.render('admin/table-reservations', {reservations: reservationsArr, isAvailable: reservationsArr.length>0});
+                                  }
+                              });
+                          });
+                      });
+                  });
+              });
+          }else{
+              res.render('admin/table-reservations');
+          }
+       });
+    });
+
+});
+
 
 
 module.exports = router;
