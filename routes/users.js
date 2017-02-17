@@ -20,7 +20,7 @@ router.get('/signup', function(req, res, next){
 });
 
 router.get('/reserveTable', isLoggedin,function (req, res, next) {
-   res.render('user/reserve-table');
+   res.render('user/reserve-table', {csrfToken: req.csrfToken()});
 });
 
 router.get('/updateProfile', isLoggedin,function (req, res, next) {
@@ -138,9 +138,7 @@ router.get('/loadPrice/:id', function (req, res, next) {
 });
 
 router.get('/loadTimeSolts/:tableId', function (req, res, next) {
-    console.log('loading data');
    var tableId = req.params.tableId;
-    console.log('table id:'+tableId);
     var timeSlotsArr = [];
     req.getConnection(function (err, conn) {
         conn.query('select time from time_slots', function (err, timeSlots) {
@@ -166,7 +164,6 @@ router.get('/loadTimeSolts/:tableId', function (req, res, next) {
 
                                     if(takenSlots.length==timeIds.length){
                                         let difference = timeSlotsArr.filter(x => takenSlots.indexOf(x) == -1);
-                                        console.log(difference);
                                         res.send(difference);
                                     }
 
@@ -175,25 +172,23 @@ router.get('/loadTimeSolts/:tableId', function (req, res, next) {
                         });
                     }else{
                         res.send(timeSlotsArr);
-                        console.log('in else');
                     }
                 });
             });
-
-
-
-
         });
-
-
-
-
-
-
-
     });
+});
 
-
+router.post('/reserve', function (req, res,next) {
+    var time_slot = req.body.slots;
+    req.getConnection(function (err, conn) {
+       conn.query('select id from time_slots where time = ?', [time_slot], function (err, ids) {
+           req.getConnection(function (err, conn) {
+               conn.query('insert into table_reservations (table_id, time_slot_id, user_id, status) values(?,?,?,?)', [req.body.tableData, ids[0].id, req.user.id, 'active']);
+               res.redirect('/user/reserveTable');
+           });
+       });
+    });
 
 });
 
