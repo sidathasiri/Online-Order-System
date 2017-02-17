@@ -98,16 +98,19 @@
                 $.each(data, function (index, cap) {
                     $('#tableData').append('<option value="'+cap.table_no+'">'+cap.table_no+'</option>')
                 });
-            });
 
-            $.get('/user/loadTimeSolts/'+$('#tableData').val(), function (data) {
-                alert(data[0]);
-                $('#slots').empty();
-                $.each(data, function (index, cap) {
-                    $('#slots').append('<option value="'+cap+'">'+cap+'</option>')
+                $.get('/user/loadPrice/'+$('#tableData').val(), function (data) {
+                    $('#priceTag').text('Price:'+data[0].price);
                 });
-            });
 
+                $.get('/user/loadTimeSolts/'+$('#tableData').val(), function (data) {
+                    $('#slots').empty();
+                    $.each(data, function (index, cap) {
+                        $('#slots').append('<option value="'+cap+'">'+cap+'</option>')
+                    });
+                });
+
+            });
 
         });
 
@@ -117,18 +120,21 @@
                 $.each(data, function (index, cap) {
                     $('#tableData').append('<option value="'+cap.table_no+'">'+cap.table_no+'</option>')
                 });
-            });
 
-            $.get('/user/loadPrice/'+$('#tableData').val(), function (data) {
-                $('#priceTag').text('Price:'+data[0].price);
-            });
-
-            $.get('/user/loadTimeSolts/'+$('#tableData').val(), function (data) {
-                $('#slots').empty();
-                $.each(data, function (index, cap) {
-                    $('#slots').append('<option value="'+cap+'">'+cap+'</option>')
+                $.get('/user/loadPrice/'+$('#tableData').val(), function (data) {
+                    $('#priceTag').text('Price:'+data[0].price);
                 });
+
+                $.get('/user/loadTimeSolts/'+$('#tableData').val(), function (data) {
+                    $('#slots').empty();
+                    $.each(data, function (index, cap) {
+                        $('#slots').append('<option value="'+cap+'">'+cap+'</option>')
+                    });
+                });
+
             });
+
+
         });
 
         $('#tableData').on('change', function () {

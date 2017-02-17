@@ -138,7 +138,9 @@ router.get('/loadPrice/:id', function (req, res, next) {
 });
 
 router.get('/loadTimeSolts/:tableId', function (req, res, next) {
+    console.log('loading data');
    var tableId = req.params.tableId;
+    console.log('table id:'+tableId);
     var timeSlotsArr = [];
     req.getConnection(function (err, conn) {
         conn.query('select time from time_slots', function (err, timeSlots) {
@@ -173,6 +175,7 @@ router.get('/loadTimeSolts/:tableId', function (req, res, next) {
                         });
                     }else{
                         res.send(timeSlotsArr);
+                        console.log('in else');
                     }
                 });
             });
