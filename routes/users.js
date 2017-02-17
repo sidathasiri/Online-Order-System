@@ -20,7 +20,8 @@ router.get('/signup', function(req, res, next){
 });
 
 router.get('/reserveTable', isLoggedin,function (req, res, next) {
-   res.render('user/reserve-table', {csrfToken: req.csrfToken()});
+    var reserveSuccess = req.flash('reserveSuccess');
+   res.render('user/reserve-table', {csrfToken: req.csrfToken(), reserveSuccess: reserveSuccess});
 });
 
 router.get('/updateProfile', isLoggedin,function (req, res, next) {
@@ -184,12 +185,71 @@ router.post('/reserve', function (req, res,next) {
     req.getConnection(function (err, conn) {
        conn.query('select id from time_slots where time = ?', [time_slot], function (err, ids) {
            req.getConnection(function (err, conn) {
-               conn.query('insert into table_reservations (table_id, time_slot_id, user_id, status) values(?,?,?,?)', [req.body.tableData, ids[0].id, req.user.id, 'active']);
+               var date = new Date();
+
+               var hour = date.getHours();
+               hour = (hour < 10 ? "0" : "") + hour;
+
+               var min  = date.getMinutes();
+               min = (min < 10 ? "0" : "") + min;
+
+               var sec  = date.getSeconds();
+               sec = (sec < 10 ? "0" : "") + sec;
+
+               var year = date.getFullYear();
+
+               var month = date.getMonth() + 1;
+               month = (month < 10 ? "0" : "") + month;
+
+               var day  = date.getDate();
+               day = (day < 10 ? "0" : "") + day;
+
+               var currentTime = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
+               conn.query('insert into table_reservations (table_id, time_slot_id, user_id, status, createdOn) values(?,?,?,?,?)', [req.body.tableData, ids[0].id, req.user.id, 'active', currentTime]);
+               req.flash('reserveSuccess', 'Reservation Successful!');
                res.redirect('/user/reserveTable');
            });
        });
     });
 
+});
+
+router.get('/myReservations', function (req, res, next) {
+    var reservationArr = [];
+    req.getConnection(function (err, conn) {
+       conn.query('select * from table_reservations where user_id = ? and status = ?', [req.user.id, 'active'], function (err, reservations) {
+           if(reservations.length>0){
+               reservations.forEach(function (reservation) {
+                   var temp = [];
+                   temp.push(reservation.table_id);
+                   req.getConnection(function (err, conn) {
+                       conn.query('select time from time_slots where id = ?', [reservation.time_slot_id], function (err, times) {
+                           temp.push(times[0].time);
+                           temp.push(reservation.createdOn);
+                           temp.push(reservation.id);
+                           reservationArr.push(temp);
+                           if(reservationArr.length==reservations.length){
+                               res.render('user/my-reservations', {reservations: reservationArr, isAvailable: reservations.length>0});
+                           }
+                       });
+
+                   });
+               });
+           }else{
+               res.render('user/my-reservations');
+           }
+
+       });
+    });
+});
+
+router.get('/cancelReservation/:id', function (req, res,next) {
+   var id = req.params.id;
+    req.getConnection(function (err, conn) {
+        conn.query('update table_reservations set status = ? where id = ?', ['finished', id], function () {
+            res.send(id);
+        });
+    });
 });
 
 module.exports = router;

@@ -1,0 +1,67 @@
+<div class="row">
+    <div class="col-md-3 pull-left" >
+        <div class="list-group">
+            <a href="/user/profile" class="list-group-item ">
+                My orders</a>
+            <a href="/user/myReservations" class="list-group-item active ">
+                My Reservations</a>
+            <a href="/user/reserveTable" class="list-group-item ">
+                Reserve Table</a>
+            <a href="/user/updateProfile" class="list-group-item ">
+                Update Profile</a>
+        </div>
+    </div>
+
+    <div class="col-md-8 ">
+        {{#if updateSuccess}}
+            <div class="alert alert-success">
+                <strong>{{updateSuccess}}</strong>
+            </div>
+        {{/if}}
+
+        <h1>My Reservations</h1>
+        <hr>
+        {{#if isAvailable}}
+            <table class="table table-hover">
+                <thead>
+                <td>Table No</td>
+                <td>Time</td>
+                <td>Created On</td>
+                <td>Action</td>
+                </thead>
+
+                <tbody>
+                {{#each reservations}}
+                    <tr>
+                        <td>{{this.[0]}}</td>
+                        <td>{{this.[1]}}</td>
+                        <td>{{this.[2]}}</td>
+                        <td><button id="{{this.[3]}}" class="btn btn-danger btn-xs">Cancel</button></td>
+
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+            {{else}}
+            <h3>No reservations!</h3>
+        {{/if}}
+
+    </div>
+</div>
+
+<script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous">
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('button').on('click', function () {
+            $.get('/user/cancelReservation/'+$(this).attr('id'), function (data) {
+                location.reload();
+            });
+
+        });
+    });
+</script>
