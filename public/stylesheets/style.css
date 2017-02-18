@@ -9,7 +9,7 @@
 .price{
     font-weight: bold;
     font-weight: 16px;
-   // color: white;
+    color: white;
 }
 
 #linkBtn{
@@ -25,9 +25,9 @@
 }
 
 
-/*
+
 .my-thumbnail{
-    border: 0px;
+    border: 1px solid #8a8279;
     background-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -36,6 +36,6 @@
 }
 
 body{
-    background: url(/images/background.png) no-repeat center fixed;
+    background: url(/images/background.jpg) no-repeat center fixed;
     background-size: cover;
-}*/
+}

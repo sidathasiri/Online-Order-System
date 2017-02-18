@@ -26,7 +26,7 @@ router.get('/burgers', function (req, res, next) {
             burgers.forEach(function (burger) {
                burger.image_path = burger.image_path.substr(7);
             });
-          res.render('shop/burgers', {burgers: burgers});
+          res.render('shop/burgers', { title: 'EasyFoods | Burgers', burgers: burgers});
         }
     });
   });
@@ -41,7 +41,7 @@ router.get('/snacks', function (req, res, next) {
             snacks.forEach(function (snack) {
                 snack.image_path = snack.image_path.substr(7);
             });
-          res.render('shop/snacks', {snacks: snacks});
+          res.render('shop/snacks', {title: 'EasyFoods | Snacks', snacks: snacks});
         }
       });
     });
@@ -56,7 +56,7 @@ router.get('/desserts', function (req, res, next) {
             desserts.forEach(function (dessert) {
                 dessert.image_path = dessert.image_path.substr(7);
             });
-          res.render('shop/desserts', {desserts: desserts});
+          res.render('shop/desserts', {title: 'EasyFoods | Desserts', desserts: desserts});
         }
       });
     });
@@ -71,7 +71,7 @@ router.get('/beverages', function (req, res, next) {
             beverages.forEach(function (beverage) {
                 beverage.image_path = beverage.image_path.substr(7);
             });
-          res.render('shop/beverages', {beverages: beverages});
+          res.render('shop/beverages', {title: 'EasyFoods | Beverages', beverages: beverages});
         }
       });
     });
@@ -182,7 +182,7 @@ router.get('/checkout', isLoggedin,function (req, res, next) {
   }
   var cart = new Cart(req.session.cart);
   var errMsg = req.flash('error')[0];
-  res.render('shop/checkout', {total: cart.totalPrice, errMsg: errMsg, noError: !errMsg});
+  res.render('shop/checkout', {title: 'EasyFoods | Checkout', total: cart.totalPrice, errMsg: errMsg, noError: !errMsg});
 
 });
 
