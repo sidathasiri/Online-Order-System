@@ -159,8 +159,9 @@ router.get('/getPrice/:id', function (req, res, next) {
    });
 });
 
-router.get('/sendCompletedMail/:customer_id', function (req, res, next) {
+router.get('/sendCompletedMail/:customer_id/:id', function (req, res, next) {
     var customer_id = req.params.customer_id;
+    var order_id = req.params.id;
     var api_key = 'key-a5c0a552c662ece5f3c279eec081b3f9';
     var domain = 'sandboxbd57df4272094073a1546c209403a45b.mailgun.org';
     var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
@@ -176,7 +177,12 @@ router.get('/sendCompletedMail/:customer_id', function (req, res, next) {
            };
 
            mailgun.messages().send(data, function (error, body) {
-               res.redirect('/admin/adminDashboard');
+               req.getConnection(function (err, conn) {
+                  conn.query('update orders set status = ? where id = ?', ['finished', order_id], function (err, result) {
+                      res.redirect('/admin/adminDashboard');
+                  });
+               });
+
            });
        });
     });
