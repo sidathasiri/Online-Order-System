@@ -34,7 +34,7 @@ router.get('/adminDashboard', function (req, res, next) {
                 order.cart = JSON.parse(order.cart);
             });
             console.log(req.csrfToken());
-            res.render('admin/adminDashboard', {orders: orders});
+            res.render('admin/adminDashboard', { title: 'EasyFoods | Admin | Orders', orders: orders});
         });
     });
 
@@ -49,7 +49,7 @@ router.get('/addFood', function (req, res, next) {
             });
             var messages = req.flash('addCat');
             var errors = req.flash('error');
-            res.render('admin/addFood', {names: names, csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length>0, errors: errors, hasValidationErrors: errors.length>0});
+            res.render('admin/addFood', { title: 'EasyFoods | Admin | Add Food', names: names, csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length>0, errors: errors, hasValidationErrors: errors.length>0});
         });
     });
 
@@ -59,7 +59,7 @@ router.get('/setAvailableFood', function (req, res, next) {
     req.getConnection(function (err, conn) {
        conn.query('select * from categories', function (err, names) {
            conn.query('select * from food_items where category_id = ?', [1], function (err, items) {
-               res.render('admin/setAvailableFood', {names: names, items:items,  csrfToken: req.csrfToken()});
+               res.render('admin/setAvailableFood', { title: 'EasyFoods | Admin | Set Food', names: names, items:items,  csrfToken: req.csrfToken()});
            });
 
        });
@@ -76,7 +76,7 @@ router.get('/myOrders', function(req, res, next){
                 order.items = cart.generateArray();
                 order.cart = JSON.parse(order.cart);
             });
-            res.render('admin/myOrders', {orders: orders});
+            res.render('admin/myOrders', { title: 'EasyFoods | Admin | My Orders', orders: orders});
         });
     });
 });
@@ -211,7 +211,7 @@ router.get('/tableReservations', function (req, res,next) {
                                   reservationsArr.push(temp);
                                   if(reservationsArr.length==reservations.length){
                                       console.log(reservationsArr);
-                                      res.render('admin/table-reservations', {reservations: reservationsArr, isAvailable: reservationsArr.length>0});
+                                      res.render('admin/table-reservations', { title: 'EasyFoods | Admin | Table Reservation', reservations: reservationsArr, isAvailable: reservationsArr.length>0});
                                   }
                               });
                           });
@@ -219,7 +219,7 @@ router.get('/tableReservations', function (req, res,next) {
                   });
               });
           }else{
-              res.render('admin/table-reservations');
+              res.render('admin/table-reservations', {title: 'EasyFoods | Admin | Table Reservation'});
           }
        });
     });

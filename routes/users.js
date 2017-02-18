@@ -3,6 +3,7 @@ var router = express.Router();
 var csrf = require('csurf');
 var passport = require('passport');
 var Cart = require('../Models/cart');
+var bcrypt = require('bcrypt-nodejs');
 
 var csrfProtection = csrf();
 router.use(csrfProtection);
@@ -10,24 +11,24 @@ router.use(csrfProtection);
 /* GET users listing. */
 router.get('/signin', function (req, res, next) {
   var messages = req.flash('error');
-  res.render('user/signin', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length>0});
+  res.render('user/signin', {title: 'EasyFoods | Signin', csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length>0});
 
 });
 
 router.get('/signup', function(req, res, next){
   var messages = req.flash('error');
-  res.render('user/signup', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length>0});
+  res.render('user/signup', {title: 'EasyFoods | Signup', csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length>0});
 });
 
 router.get('/reserveTable', isLoggedin,function (req, res, next) {
     var reserveSuccess = req.flash('reserveSuccess');
-   res.render('user/reserve-table', {csrfToken: req.csrfToken(), reserveSuccess: reserveSuccess});
+   res.render('user/reserve-table', {title: 'EasyFoods | Reserve Table', csrfToken: req.csrfToken(), reserveSuccess: reserveSuccess});
 });
 
 router.get('/updateProfile', isLoggedin,function (req, res, next) {
     var updateSuccess = req.flash('updateSuccess');
     var updateError = req.flash('updateError');
-    res.render('user/update-profile', {csrfToken: req.csrfToken(), updateSuccess: updateSuccess, updateError: updateError});
+    res.render('user/update-profile', {title: 'EasyFoods | Update Profile', csrfToken: req.csrfToken(), updateSuccess: updateSuccess, updateError: updateError});
 });
 
 router.get('/profile', isLoggedin,function (req, res, next) {
@@ -40,7 +41,7 @@ router.get('/profile', isLoggedin,function (req, res, next) {
         order.cart = JSON.parse(order.cart);
       });
       if(req.user.post=='customer')
-        res.render('user/profile', {orders: orders, name: req.user.name});
+        res.render('user/profile', {title: 'EasyFoods | Profile', orders: orders, name: req.user.name});
       else
         res.redirect('/admin/adminDashboard');
     });
@@ -98,6 +99,38 @@ router.post('/changeEmail', function (req, res, next) {
                 req.flash('updateSuccess', 'Update Successfull');
                 res.redirect('/user/updateProfile');
             });
+        });
+    }
+});
+
+router.post('/changePassword', function (req, res, next) {
+   var userId = req.user.id;
+    if(req.body.password == ""){
+        req.flash('updateError', "Password should not be empty");
+        res.redirect('/user/updateProfile');
+        console.log('empty');
+    }
+
+    else if(req.body.password.length<4){
+        req.flash('updateError', "Password too short");
+        res.redirect('/user/updateProfile');
+        console.log('too short');
+    }
+
+    else if(req.body.password != req.body.re_password){
+        req.flash('updateError', "Passwords does not match");
+        res.redirect('/user/updateProfile');
+        console.log('match err');
+    }
+
+    else{
+        var salt = bcrypt.genSaltSync(10);
+        var hash = bcrypt.hashSync(req.body.password, salt);
+        req.getConnection(function (err, conn) {
+           conn.query('update users set password = ? where id = ?', [hash, userId], function (err, result) {
+               req.flash('updateSuccess', "Passwords change successful!");
+               res.redirect('/user/updateProfile');
+           });
         });
     }
 });
@@ -229,14 +262,14 @@ router.get('/myReservations', function (req, res, next) {
                            temp.push(reservation.id);
                            reservationArr.push(temp);
                            if(reservationArr.length==reservations.length){
-                               res.render('user/my-reservations', {reservations: reservationArr, isAvailable: reservations.length>0});
+                               res.render('user/my-reservations', {title: 'EasyFoods | My Reservations', reservations: reservationArr, isAvailable: reservations.length>0});
                            }
                        });
 
                    });
                });
            }else{
-               res.render('user/my-reservations');
+               res.render('user/my-reservations', {title: 'EasyFoods | My Reservations'});
            }
 
        });

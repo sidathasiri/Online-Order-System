@@ -169,7 +169,7 @@ router.get('/remove/:id', function (req, res, next) {
 
 router.get('/shopping-cart', function (req, res, next) {
   if(!req.session.cart){
-    return res.render('shop/shopping-cart', {packages: null});
+    return res.render('shop/shopping-cart', { title: 'EasyFoods | Shopping Cart', packages: null});
   }
 
   var cart = new Cart(req.session.cart);
