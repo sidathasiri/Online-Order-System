@@ -176,7 +176,7 @@ router.get('/sendCompletedMail/:customer_id/:id', function (req, res, next) {
                text: 'We just shipped your order and will reach you soon. Thanks for using our web app!'
            };
 
-           mailgun.messages().send(data, function (error, body) {
+               mailgun.messages().send(data, function (error, body) {
                req.getConnection(function (err, conn) {
                   conn.query('update orders set status = ? where id = ?', ['finished', order_id], function (err, result) {
                       res.redirect('/admin/adminDashboard');

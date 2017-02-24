@@ -216,13 +216,34 @@ router.post('/checkout', isLoggedin,function(req, res, next){
           return res.redirect('/user/profile');
         }
         req.flash('success', 'Successfully completed!');
+
+        var cartItems = cart.generateArray();
+
         req.session.cart = null;
-        res.redirect('/');
+
+        var api_key = 'key-a5c0a552c662ece5f3c279eec081b3f9';
+        var domain = 'sandboxbd57df4272094073a1546c209403a45b.mailgun.org';
+        var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
+
+        var x = "";
+        for(var i=0; i<cartItems.length; i++){
+          x += '<tr><td style="border: 1px solid black; background-color: #e0faff;">'+ cartItems[i].item.name+'</td>'  + '  <td style="border: 1px solid black; background-color: #e0faff;">'+ cartItems[i].qty+'</td>'  + '  <td style="border: 1px solid black; background-color: #e0faff;">'+ cartItems[i].price+'</td></tr>'
+        }
+
+        var data = {
+          from: 'EasyFoods <postmaster@sandboxbd57df4272094073a1546c209403a45b.mailgun.org>',
+          to: req.user.email,
+          subject: 'Order is placed',
+          html: '<h1>You just placed an order on EasyFoods!</h1>' + '<table style="border: 1px solid black;"><thead style="font-weight: bold; background-color: #2cc5e8; color: white"><tr><td style="border: 1px solid black;">Item Name</td><td style="border: 1px solid black;">Quantity</td><td style="border: 1px solid black;">Price</td></tr></thead><tbody>' + x + '</tbody></table> <br> <p>Payment Id: '+charge.id+'</p><p>Date: ' +formatted+ '</p><hr><p>Thanks for using EasyFoods online services</p>'
+        };
+
+        mailgun.messages().send(data, function (error, body) {
+          console.log(cartItems);
+          res.redirect('/');
+        });
+
       });
     });
-
-
-
   });
 });
 
