@@ -171,7 +171,7 @@ router.get('/loadPrice/:id', function (req, res, next) {
 
 });
 
-router.get('/loadTimeSolts/:tableId', function (req, res, next) {
+router.get('/loadTimeSolts/:tableId/:date', function (req, res, next) {
    var tableId = req.params.tableId;
     var timeSlotsArr = [];
     req.getConnection(function (err, conn) {
@@ -182,7 +182,8 @@ router.get('/loadTimeSolts/:tableId', function (req, res, next) {
 
             var timeIdArr = [];
             req.getConnection(function (err, conn) {
-                conn.query('select time_slot_id from table_reservations where table_id = ?  and status = ?', [tableId, 'active'], function (err, timeIds) {
+                console.log(tableId, req.params.date);
+                conn.query('select time_slot_id from table_reservations where table_id = ?  and status = ? and date = ?', [tableId, 'active', req.params.date], function (err, timeIds) {
                     if(timeIds.length>0){
                         timeIds.forEach(function (id) {
                             timeIdArr.push(id.time_slot_id);
@@ -194,10 +195,12 @@ router.get('/loadTimeSolts/:tableId', function (req, res, next) {
                                 conn.query('select time from time_slots where id = ?', [id], function (err, times) {
                                     times.forEach(function (slot) {
                                         takenSlots.push(slot.time);
+                                        console.log('takenSlots:'+takenSlots);
                                     });
 
                                     if(takenSlots.length==timeIds.length){
                                         let difference = timeSlotsArr.filter(x => takenSlots.indexOf(x) == -1);
+                                        console.log(difference);
                                         res.send(difference);
                                     }
 
@@ -205,6 +208,7 @@ router.get('/loadTimeSolts/:tableId', function (req, res, next) {
                             });
                         });
                     }else{
+                        console.log('in not found results');
                         res.send(timeSlotsArr);
                     }
                 });
@@ -238,7 +242,7 @@ router.post('/reserve', function (req, res,next) {
                day = (day < 10 ? "0" : "") + day;
 
                var currentTime = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
-               conn.query('insert into table_reservations (table_id, time_slot_id, user_id, status, createdOn) values(?,?,?,?,?)', [req.body.tableData, ids[0].id, req.user.id, 'active', currentTime]);
+               conn.query('insert into table_reservations (table_id, time_slot_id, user_id, status, createdOn, date) values(?,?,?,?,?,?)', [req.body.tableData, ids[0].id, req.user.id, 'active', currentTime, req.body.date]);
                req.flash('reserveSuccess', 'Reservation Successful!');
                res.redirect('/user/reserveTable');
            });

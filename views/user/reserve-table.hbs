@@ -73,6 +73,21 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-md-3">
+                            <label for="capacity">Select Date:</label>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" name="date" id="date" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <h3>Step 4</h3>
+                <br>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-3">
                             <label for="capacity">Select time:</label>
                         </div>
                         <div class="col-md-3">
@@ -118,8 +133,9 @@
                     $('#priceTag').text('Price:'+data[0].price);
                 });
 
-                $.get('/user/loadTimeSolts/'+$('#tableData').val(), function (data) {
+                $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
                     $('#slots').empty();
+                    alert('test');
                     $.each(data, function (index, cap) {
                         $('#slots').append('<option value="'+cap+'">'+cap+'</option>')
                     });
@@ -140,7 +156,7 @@
                     $('#priceTag').text('Price:'+data[0].price);
                 });
 
-                $.get('/user/loadTimeSolts/'+$('#tableData').val(), function (data) {
+                $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
                     $('#slots').empty();
                     $.each(data, function (index, cap) {
                         $('#slots').append('<option value="'+cap+'">'+cap+'</option>')
@@ -148,8 +164,6 @@
                 });
 
             });
-
-
         });
 
         $('#tableData').on('change', function () {
@@ -157,13 +171,23 @@
                 $('#priceTag').text('Price:'+data[0].price);
             });
 
-            $.get('/user/loadTimeSolts/'+$('#tableData').val(), function (data) {
+            $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
                 $('#slots').empty();
                 $.each(data, function (index, cap) {
                     $('#slots').append('<option value="'+cap+'">'+cap+'</option>')
                 });
             });
 
+        });
+
+
+        $('#date').on('change', function () {
+            $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
+                $('#slots').empty();
+                $.each(data, function (index, cap) {
+                    $('#slots').append('<option value="'+cap+'">'+cap+'</option>')
+                });
+            });
         });
 
     });
