@@ -208,6 +208,7 @@ router.get('/tableReservations', function (req, res,next) {
                               conn.query('select name from users where id = ?', [reservation.user_id], function (err, names) {
                                   temp.push(names[0].name);
                                   temp.push(reservation.id);
+                                  temp.push(reservation.date);
                                   reservationsArr.push(temp);
                                   if(reservationsArr.length==reservations.length){
                                       console.log(reservationsArr);

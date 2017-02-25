@@ -264,6 +264,7 @@ router.get('/myReservations', function (req, res, next) {
                            temp.push(times[0].time);
                            temp.push(reservation.createdOn);
                            temp.push(reservation.id);
+                           temp.push(reservation.date);
                            reservationArr.push(temp);
                            if(reservationArr.length==reservations.length){
                                res.render('user/my-reservations', {title: 'EasyFoods | My Reservations', reservations: reservationArr, isAvailable: reservations.length>0});

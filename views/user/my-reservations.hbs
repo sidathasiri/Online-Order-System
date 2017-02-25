@@ -32,6 +32,7 @@
             <table class="table">
                 <thead>
                 <td>Table No</td>
+                <td>Date</td>
                 <td>Time</td>
                 <td>Created On</td>
                 <td>Action</td>
@@ -41,6 +42,7 @@
                 {{#each reservations}}
                     <tr>
                         <td>{{this.[0]}}</td>
+                        <td>{{this.[4]}}</td>
                         <td>{{this.[1]}}</td>
                         <td>{{this.[2]}}</td>
                         <td><button id="{{this.[3]}}" class="btn btn-danger btn-xs">Cancel</button></td>
