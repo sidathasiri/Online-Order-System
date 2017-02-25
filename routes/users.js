@@ -289,6 +289,15 @@ router.get('/cancelReservation/:id', function (req, res,next) {
     });
 });
 
+router.get('/loadTableImage/:id', function (req, res, next) {
+   var table_id = req.params.id;
+    req.getConnection(function (err, conn) {
+       conn.query('select image_path from tables where table_no = ?', [table_id], function (err, paths) {
+         res.send(paths[0].image_path);
+       });
+    });
+});
+
 module.exports = router;
 
 function isLoggedin(req, res, next){

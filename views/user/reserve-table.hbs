@@ -18,6 +18,10 @@
         cursor: default;
     }
 
+    #table_image{
+        max-height: 170px;
+    }
+
 </style>
 
 <div class="row">
@@ -80,6 +84,13 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <img id="table_image"  class="img-thumbnail img-responsive">
+                </div>
+
             </div>
 
             <div class="row">
@@ -148,6 +159,10 @@
                     $('#priceTag').text('Price:'+data[0].price);
                 });
 
+                $.get('/user//loadTableImage/'+$('#tableData').val(), function (data) {
+                    $('#table_image').attr('src', data);
+                });
+
                 $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
                     $('#slots').empty();
                     alert('test');
@@ -171,6 +186,10 @@
                     $('#priceTag').text('Price:'+data[0].price);
                 });
 
+                $.get('/user//loadTableImage/'+$('#tableData').val(), function (data) {
+                    $('#table_image').attr('src', data);
+                });
+
                 $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
                     $('#slots').empty();
                     $.each(data, function (index, cap) {
@@ -184,6 +203,10 @@
         $('#tableData').on('change', function () {
             $.get('/user/loadPrice/'+$('#tableData').val(), function (data) {
                 $('#priceTag').text('Price:'+data[0].price);
+            });
+
+            $.get('/user//loadTableImage/'+$(this).val(), function (data) {
+               $('#table_image').attr('src', data);
             });
 
             $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
