@@ -88,7 +88,7 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <img id="table_image"  class="img-thumbnail img-responsive">
+                    <img id="table_image" style="display: none" class="img-thumbnail img-responsive">
                 </div>
 
             </div>
@@ -160,7 +160,7 @@
                 });
 
                 $.get('/user//loadTableImage/'+$('#tableData').val(), function (data) {
-                    $('#table_image').attr('src', data);
+                    $('#table_image').attr('src', data).slideToggle('slow');
                 });
 
                 $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
@@ -187,7 +187,7 @@
                 });
 
                 $.get('/user//loadTableImage/'+$('#tableData').val(), function (data) {
-                    $('#table_image').attr('src', data);
+                    $('#table_image').attr('src', data).css('display', 'none').slideToggle('slow');
                 });
 
                 $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
@@ -206,7 +206,7 @@
             });
 
             $.get('/user//loadTableImage/'+$(this).val(), function (data) {
-               $('#table_image').attr('src', data);
+               $('#table_image').attr('src', data).css('display', 'none').slideToggle('slow');
             });
 
             $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
@@ -227,6 +227,8 @@
                 });
             });
         });
+
+
 
     });
 </script>
