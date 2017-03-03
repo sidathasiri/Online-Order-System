@@ -137,7 +137,7 @@ router.post('/changePassword', function (req, res, next) {
 
 router.get('/loadCapacity', function (req, res, next) {
    req.getConnection(function (err, conn) {
-     conn.query('select distinct capacity from tables', function (err, capacities) {
+     conn.query('select distinct capacity from tables order by capacity', function (err, capacities) {
          var capacitityArr = [];
          capacities.forEach(function (cap) {
             capacitityArr.push(cap.capacity);

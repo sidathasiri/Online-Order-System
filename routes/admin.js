@@ -127,8 +127,6 @@ router.post('/addNewFood',function (req, res, next) {
             });
         });
     }
-
-
 });
 
 router.get('/loadItems/:id', function (req, res, next) {
@@ -225,6 +223,42 @@ router.get('/tableReservations', function (req, res,next) {
        });
     });
 
+});
+
+router.get('/addTable', function (req, res, next) {
+    var errors = req.flash('error');
+    var success = req.flash('success');
+   res.render('admin/addTable', {csrfToken: req.csrfToken(), errors: errors, hasValidationErrors: errors.length>0, success:success});
+});
+
+router.post('/addNewTable', function (req, res, next) {
+    req.checkBody('capacity', 'Capacity is invalid').notEmpty().isInt();
+    req.checkBody('price', 'Price is invalid').notEmpty().isNumeric();
+
+    var errors = req.validationErrors();
+    if(errors){
+        var messages = [];
+        errors.forEach(function (error) {
+            if(messages.indexOf(error.msg) <=-1)
+                messages.push(error.msg);
+        });
+
+        req.flash('error', messages);
+        console.log('in validation error: '+ messages);
+        res.redirect('/admin/addTable');
+    }
+
+    else{
+        req.getConnection(function (err, conn) {
+            conn.query('insert into tables (capacity, price, image_path) values(?,?,?)', [req.body.capacity, req.body.price, req.file.path.substr(6)], function (err, result) {
+                if(err)
+                    console.log(err);
+                req.flash('success', 'Added successfully!');
+                res.redirect('/admin/addTable');
+            });
+
+        });
+    }
 });
 
 
