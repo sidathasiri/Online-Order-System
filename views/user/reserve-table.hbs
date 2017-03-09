@@ -98,9 +98,25 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <img id="table_image" style="display: none" class="img-thumbnail img-responsive">
+                    <img id="table_image" data-toggle="modal" data-target="#myModal" style="display: none" class="img-thumbnail img-responsive">
                 </div>
 
+            </div>
+
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <img id="zoomedImg"  style="width:100%; margin-left: auto; margin-right: auto; display: block">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
             <div class="row">
@@ -172,6 +188,7 @@
 
                 $.get('/user//loadTableImage/'+$('#tableData').val(), function (data) {
                     $('#table_image').attr('src', data).fadeToggle('slow');
+                    $('#zoomedImg').attr('src', data);
                 });
 
                 $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
@@ -199,6 +216,7 @@
 
                 $.get('/user//loadTableImage/'+$('#tableData').val(), function (data) {
                     $('#table_image').attr('src', data).css('display', 'none').slideToggle('slow');
+                    $('#zoomedImg').attr('src', data);
                 });
 
                 $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
@@ -218,6 +236,7 @@
 
             $.get('/user//loadTableImage/'+$(this).val(), function (data) {
                $('#table_image').attr('src', data).css('display', 'none').slideToggle('slow');
+                $('#zoomedImg').attr('src', data);
             });
 
             $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
