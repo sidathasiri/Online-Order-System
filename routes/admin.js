@@ -6,6 +6,7 @@ var Cart = require('../Models/cart');
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var bodyParser = require('body-parser');
+var request = require('request');
 
 var storage = multer.diskStorage({
     destination: function(req, file, cb){
@@ -259,6 +260,23 @@ router.post('/addNewTable', function (req, res, next) {
 
         });
     }
+});
+
+router.get('/report', function (req, res, next) {
+    var data = {
+        template: {'shortid': 'H1gb6hVhx'},
+        options: {
+            preview: true
+        }
+    }
+
+    var options = {
+        uri: "http://localhost:3001/api/report",
+        method: 'POST',
+        json: data
+    }
+
+    request(options).pipe(res);
 });
 
 
