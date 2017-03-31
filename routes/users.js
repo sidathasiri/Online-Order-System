@@ -42,8 +42,12 @@ router.get('/profile', isLoggedin,function (req, res, next) {
       });
       if(req.user.post=='customer')
         res.render('user/profile', {title: 'EasyFoods | Profile', orders: orders, name: req.user.name});
-      else
+
+        if(req.user.post=='admin')
         res.redirect('/admin/adminDashboard');
+
+        if(req.user.post=='delivery')
+            res.redirect('/admin/deliveryDashboard');
     });
   });
 
@@ -79,6 +83,9 @@ router.post('/signin', passport.authenticate('local.signin', {
 
     if(req.user.post == 'admin')
       res.redirect('/user/profile');
+
+      if(req.user.post == 'delivery')
+          res.redirect('/user/profile');
   }
 });
 

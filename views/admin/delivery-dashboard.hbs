@@ -1,0 +1,57 @@
+<style>
+    h1, label, h3{
+        color: white;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-3 pull-left" >
+        <div class="list-group">
+            <a href="/user/profile" class="list-group-item active">
+                Customer orders
+            </a>
+
+
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="page-header">
+            <h1>Customers Orders</h1>
+            <hr>
+            {{#each orders}}
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <li class="list-group-item">
+                            <strong>Customer Name:</strong>
+                            {{ this.name}}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Address:</strong>
+                            {{ this.address}}
+                        </li>
+                        <ul class="list-group">
+                            <div style="margin: 7px">
+                                <strong>Items:</strong>
+                            </div>
+
+                            {{#each this.items}}
+                                <li class="list-group-item">
+                                    <span class="badge">{{ this.price }}</span>
+                                    {{ this.item.name }} | {{ this.qty }}
+                                </li>
+                            {{/each}}
+                        </ul>
+
+                        <div class="container" style="margin-left: 80%">
+                            <button type="button" class="btn btn-primary"><a id="linkBtn" href="/admin/sendCompletedMail/{{this.customer_id}}/{{this.id}}">Mark Finished</a></button>
+                        </div>
+
+                    </div>
+
+                    <div class="panel-footer"><strong>Total Price:Rs.{{ this.cart.totalPrice }}/=</strong> <span class="pull-right"> <strong>Date:</strong> {{ this.date}}</span></div>
+                </div>
+            {{/each}}
+        </div>
+
+    </div>
+</div>

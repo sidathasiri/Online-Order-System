@@ -42,6 +42,24 @@ router.get('/adminDashboard', function (req, res, next) {
 
 });
 
+router.get('/deliveryDashboard', function (req, res, next) {
+    req.getConnection(function (err, conn) {
+        //get orders from database
+        conn.query('select * from orders where status = ?', ['pending'],function(err, orders){
+            var cart;
+            orders.forEach(function(order){
+                cart = new Cart(JSON.parse(order.cart));
+                order.items = cart.generateArray();
+                order.cart = JSON.parse(order.cart);
+            });
+            console.log(req.csrfToken());
+            res.render('admin/delivery-dashboard', { title: 'EasyFoods | Delivery | Orders', orders: orders});
+        });
+    });
+
+});
+
+
 router.get('/addFood', function (req, res, next) {
     var names = [];
     req.getConnection(function (err, conn) {
@@ -186,7 +204,10 @@ router.get('/sendCompletedMail/:customer_id/:id', function (req, res, next) {
                mailgun.messages().send(data, function (error, body) {
                req.getConnection(function (err, conn) {
                   conn.query('update orders set status = ? where id = ?', ['finished', order_id], function (err, result) {
-                      res.redirect('/admin/adminDashboard');
+                      if(req.user.post == 'admin')
+                          res.redirect('/admin/adminDashboard');
+                      else if(req.user.post == 'delivery')
+                          res.redirect('/admin/deliveryDashboard');
                   });
                });
 
