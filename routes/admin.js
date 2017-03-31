@@ -27,6 +27,7 @@ router.use(csrfProtection);
 
 router.get('/adminDashboard', function (req, res, next) {
     req.getConnection(function (err, conn) {
+        //get orders from database
         conn.query('select * from orders where status = ?', ['pending'],function(err, orders){
             var cart;
             orders.forEach(function(order){
@@ -44,6 +45,7 @@ router.get('/adminDashboard', function (req, res, next) {
 router.get('/addFood', function (req, res, next) {
     var names = [];
     req.getConnection(function (err, conn) {
+        //load categories
         conn.query('select name from categories', function (err, categories) {
             categories.forEach(function (category) {
                 names.push(category);
@@ -58,6 +60,7 @@ router.get('/addFood', function (req, res, next) {
 
 router.get('/setAvailableFood', function (req, res, next) {
     req.getConnection(function (err, conn) {
+        //load categories
        conn.query('select * from categories', function (err, names) {
            conn.query('select * from food_items where category_id = ?', [1], function (err, items) {
                res.render('admin/setAvailableFood', { title: 'EasyFoods | Admin | Set Food', names: names, items:items,  csrfToken: req.csrfToken()});
@@ -72,6 +75,7 @@ router.get('/myOrders', function(req, res, next){
     req.getConnection(function (err, conn) {
         conn.query('select * from orders where customer_id = ?', [req.user.id], function(err, orders){
             var cart;
+            //update cart
             orders.forEach(function(order){
                 cart = new Cart(JSON.parse(order.cart));
                 order.items = cart.generateArray();
@@ -87,6 +91,7 @@ router.post('/addNewCategory', function (req, res, next) {
     req.getConnection(function (err, conn) {
        conn.query('select name from categories where name = ?', [catName], function (err, result) {
           if(result.length==0){
+              //insert to cart
               conn.query('insert into categories (name) values(?)', [catName], function (err, result) {
                   req.flash('addCat', 'Added Successfully');
                   res.redirect('/admin/addFood');
@@ -105,6 +110,7 @@ router.post('/addNewFood',function (req, res, next) {
     req.checkBody('itemName', 'Item name should not be empty').notEmpty();
     req.checkBody('price', 'Price is invalid').notEmpty().isNumeric();
 
+    //check errors
     var errors = req.validationErrors();
     if(errors){
         var messages = [];
@@ -120,6 +126,7 @@ router.post('/addNewFood',function (req, res, next) {
         var catName = req.body.category;
         req.getConnection(function (err, conn) {
             conn.query('select id from categories where name = ?', [catName], function (err, id) {
+                //insert to database
                 conn.query('insert into food_items (name, price, category_id, image_path) values(?,?,?,?)', [req.body.itemName, req.body.price, id[0].id, req.file.path], function (err, result) {
                     if(err)
                         console.log(err);
@@ -144,6 +151,7 @@ router.post('/update', function (req, res, next) {
     var itemId = req.body.items;
     var price = req.body.price;
     req.getConnection(function (err, conn) {
+        //update price
        conn.query('update food_items set price = ?, availability = ? where id = ?', [price, availability, itemId], function (err, result) {
           res.redirect('/admin/setAvailableFood');
        });
@@ -167,7 +175,7 @@ router.get('/sendCompletedMail/:customer_id/:id', function (req, res, next) {
 
     req.getConnection(function (err, conn) {
        conn.query('select email from users where id=?', [customer_id], function (err, email) {
-
+            //send mail
            var data = {
                from: 'EasyFoods <postmaster@sandboxbd57df4272094073a1546c209403a45b.mailgun.org>',
                to: email[0].email,
@@ -196,6 +204,7 @@ router.get('/tableReservations', function (req, res,next) {
           if(reservations.length>0){
               reservations.forEach(function (reservation) {
                   var temp = [];
+                  //load available time slots
                   temp.push(reservation.table_id);
                   temp.push(reservation.createdOn);
                   console.log(reservation.time_slot_id);

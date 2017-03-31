@@ -15,6 +15,7 @@ module.exports = function Cart(oldCart) {
         this.totalPrice += storedItem.item.price;
     };
 
+    //remove one item
     this.reduceByOne = function (id) {
         this.items[id].qty--;
         this.items[id].price -= this.items[id].item.price;
@@ -26,12 +27,14 @@ module.exports = function Cart(oldCart) {
         }
     };
 
+    //remove item from cart
     this.removeItem = function (id) {
         this.totalQty -= this.items[id].qty;
         this.totalPrice -= this.items[id].price;
         delete this.items[id];
     };
 
+    //generate array of items in cart
     this.generateArray = function () {
         var arr = [];
         for(var id in this.items){

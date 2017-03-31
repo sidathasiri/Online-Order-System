@@ -23,6 +23,7 @@ router.get('/burgers', function (req, res, next) {
     conn.query('select id from categories where name = ?', ['Burgers'], function (err, id) {
       conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, burgers) {
         if(burgers){
+          //set image path
             burgers.forEach(function (burger) {
                burger.image_path = burger.image_path.substr(7);
             });
@@ -210,6 +211,7 @@ router.post('/checkout', isLoggedin,function(req, res, next){
     var formatted = dt.format('Y-m-d H:M:S');
 
     req.getConnection(function (err, conn) {
+      //insert order to database
       conn.query('insert into orders (customer_id, cart,address, name, payment_id, date) values(?,?,?,?,?,?)', [req.user.id, JSON.stringify(cart),req.body.address, req.body.name, charge.id, formatted], function (err, result) {
         if(err){
           console.log('error', err);
