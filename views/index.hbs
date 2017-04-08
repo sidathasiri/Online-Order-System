@@ -26,7 +26,7 @@
                 <h3>{{this.name}}</h3>
                 <div class="clearfix">
                     <div class="price pull-left">Rs.{{this.price}}/=</div>
-                    <a href="/add-to-cart/{{this.id}}/package" class="btn btn-success pull-right" role="button">Add to cart</a>
+                    <a id="{{this.id}}" class="btn btn-success pull-right" role="button">Add to cart</a>
                 </div>
             </div>
          </div>
@@ -34,6 +34,19 @@
     {{/each}}
 </div>
 {{/each}}
+
+<script>
+    $(document).ready(function(){
+        $("a[role='button']").click(function(){
+            $.get("/add-to-cart/"+this.id+"/package", function(data){
+                $("#shoping_cart").text(data.qty);
+            });
+        });
+    });
+</script>
+
+
+
 
 
 

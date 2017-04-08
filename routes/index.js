@@ -93,7 +93,7 @@ router.get('/add-to-cart/:id/:type', function (req,res, next) {
         cart.add(package[0], package[0].id);
         req.session.cart = cart;
         console.log(req.session.cart);
-        res.redirect('/');
+        res.send({qty: cart.totalQty});
 
       });
     }
@@ -105,7 +105,7 @@ router.get('/add-to-cart/:id/:type', function (req,res, next) {
         cart.add(package[0], package[0].id);
         req.session.cart = cart;
         console.log(req.session.cart);
-        res.redirect('/burgers');
+        res.send({qty: cart.totalQty});
 
       });
     }
@@ -118,7 +118,7 @@ router.get('/add-to-cart/:id/:type', function (req,res, next) {
         cart.add(package[0], package[0].id);
         req.session.cart = cart;
         console.log(req.session.cart);
-        res.redirect('/snacks');
+        res.send({qty: cart.totalQty});
 
       });
     }
@@ -131,7 +131,7 @@ router.get('/add-to-cart/:id/:type', function (req,res, next) {
         cart.add(package[0], package[0].id);
         req.session.cart = cart;
         console.log(req.session.cart);
-        res.redirect('/desserts');
+        res.send({qty: cart.totalQty});
 
       });
     }
@@ -144,7 +144,7 @@ router.get('/add-to-cart/:id/:type', function (req,res, next) {
         cart.add(package[0], package[0].id);
         req.session.cart = cart;
         console.log(req.session.cart);
-        res.redirect('/beverages');
+        res.send({qty: cart.totalQty});
 
       });
     }
