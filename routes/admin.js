@@ -294,9 +294,10 @@ router.post('/addNewTable', function (req, res, next) {
 
 router.get('/report', function (req, res, next) {
     var data = {
-        template: {'shortid': 'H1gb6hVhx'},
+        template: {'shortid': 'H1gb6hVhx', "recipe" : "phantom-pdf"},
         options: {
-            preview: true
+            preview: true,
+            "Content-Disposition": "attachment; filename=myreport.pdf"
         }
     }
 

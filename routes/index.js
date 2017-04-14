@@ -4,7 +4,13 @@ var Cart = require('../Models/cart');
 var dateTime = require('node-datetime');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+
+router.get('/', function (req, res, next) {
+   res.render('welcome', {layout: null});
+});
+
+
+router.get('/menu', function(req, res, next) {
   var chunks = [];
   var successMsg = req.flash('success')[0];
   req.getConnection(function (err, conn){
@@ -241,7 +247,7 @@ router.post('/checkout', isLoggedin,function(req, res, next){
 
         mailgun.messages().send(data, function (error, body) {
           console.log(cartItems);
-          res.redirect('/');
+          res.redirect('/menu');
         });
 
       });
