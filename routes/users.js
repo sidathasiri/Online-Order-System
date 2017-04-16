@@ -338,6 +338,19 @@ router.get('/loadUserData', function (req, res, next) {
     });
 });
 
+router.get('/isValidUser/:email', function (req, res, next) {
+   var checkingEmail = req.params.email;
+   req.getConnection(function (err, conn) {
+       conn.query('select * from users where email = ?', [checkingEmail], function (err, result) {
+          if(result.length>0)
+              res.send(true);
+
+          else
+              res.send(false);
+       });
+   });
+});
+
 module.exports = router;
 
 function isLoggedin(req, res, next){

@@ -4,8 +4,7 @@
     <list default="true" id="c04d358b-8444-4378-a84b-dc0d08e423ce" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/users.js" afterPath="$PROJECT_DIR$/routes/users.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/shop/checkout.hbs" afterPath="$PROJECT_DIR$/views/shop/checkout.hbs" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/user/update-profile.hbs" afterPath="$PROJECT_DIR$/views/user/update-profile.hbs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/user/signin.hbs" afterPath="$PROJECT_DIR$/views/user/signin.hbs" />
     </list>
     <ignored path="Restaurant.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -27,32 +26,24 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="checkout.hbs" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/views/shop/checkout.hbs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="267">
-              <caret line="53" column="51" lean-forward="false" selection-start-line="53" selection-start-column="51" selection-end-line="53" selection-end-column="51" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="users.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/routes/users.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="279">
-              <caret line="335" column="67" lean-forward="false" selection-start-line="335" selection-start-column="67" selection-end-line="335" selection-end-column="67" />
+            <state relative-caret-position="109">
+              <caret line="340" column="24" lean-forward="false" selection-start-line="340" selection-start-column="13" selection-end-line="340" selection-end-column="24" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="reserve-table.hbs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/views/user/reserve-table.hbs">
+      <file leaf-file-name="signin.hbs" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/views/user/signin.hbs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-918">
-              <caret line="125" column="31" lean-forward="false" selection-start-line="125" selection-start-column="31" selection-end-line="125" selection-end-column="31" />
-              <folding />
+            <state relative-caret-position="233">
+              <caret line="24" column="20" lean-forward="false" selection-start-line="24" selection-start-column="20" selection-end-line="24" selection-end-column="20" />
+              <folding>
+                <element signature="n#style#0;n#div#1;n#form#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -78,7 +69,6 @@
         <option value="$PROJECT_DIR$/passport/config.js" />
         <option value="$PROJECT_DIR$/public/stylesheets/style.css" />
         <option value="$PROJECT_DIR$/views/shop/shopping-cart.hbs" />
-        <option value="$PROJECT_DIR$/views/user/signin.hbs" />
         <option value="$PROJECT_DIR$/views/user/signup.hbs" />
         <option value="$PROJECT_DIR$/views/user/profile.hbs" />
         <option value="$PROJECT_DIR$/public/email/order.html" />
@@ -105,8 +95,9 @@
         <option value="$PROJECT_DIR$/views/partials/header.hbs" />
         <option value="$PROJECT_DIR$/views/welcome.hbs" />
         <option value="$PROJECT_DIR$/views/user/update-profile.hbs" />
-        <option value="$PROJECT_DIR$/routes/users.js" />
         <option value="$PROJECT_DIR$/views/shop/checkout.hbs" />
+        <option value="$PROJECT_DIR$/routes/users.js" />
+        <option value="$PROJECT_DIR$/views/user/signin.hbs" />
       </list>
     </option>
   </component>
@@ -871,12 +862,12 @@
       <workItem from="1492085560330" duration="1066000" />
       <workItem from="1492142865845" duration="1264000" />
       <workItem from="1492144192367" duration="3900000" />
-      <workItem from="1492316899392" duration="1609000" />
+      <workItem from="1492316899392" duration="3301000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="271723000" />
+    <option name="totallyTimeSpent" value="273415000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1018,13 +1009,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/views/user/signin.hbs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="4" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/views/user/signup.hbs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
@@ -1129,6 +1113,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-289">
           <caret line="58" column="13" lean-forward="false" selection-start-line="58" selection-start-column="13" selection-end-line="59" selection-end-column="59" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1241,14 +1226,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/routes/users.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="335" column="67" lean-forward="false" selection-start-line="335" selection-start-column="67" selection-end-line="335" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/views/user/reserve-table.hbs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-918">
@@ -1259,9 +1236,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/views/shop/checkout.hbs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="267">
+        <state relative-caret-position="264">
           <caret line="53" column="51" lean-forward="false" selection-start-line="53" selection-start-column="51" selection-end-line="53" selection-end-column="51" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routes/users.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="109">
+          <caret line="340" column="24" lean-forward="false" selection-start-line="340" selection-start-column="13" selection-end-line="340" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/user/signin.hbs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="233">
+          <caret line="24" column="20" lean-forward="false" selection-start-line="24" selection-start-column="20" selection-end-line="24" selection-end-column="20" />
+          <folding>
+            <element signature="n#style#0;n#div#1;n#form#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
