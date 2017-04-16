@@ -306,6 +306,38 @@ router.get('/loadTableImage/:id', function (req, res, next) {
     });
 });
 
+router.post('/changeAddress', function (req, res, next) {
+    var userId = req.user.id;
+
+    if(req.body.address == ""){
+        req.flash('updateError', "Address should not be empty");
+        res.redirect('/user/updateProfile');
+        console.log('empty address');
+    }
+
+    else{
+        req.getConnection(function (err, conn) {
+            conn.query('update users set address = ? where id = ?', [req.body.address, userId], function (err, result) {
+                if(!err){
+                    req.flash('updateSuccess', "Updated address successfully!");
+                    res.redirect('/user/updateProfile');
+                }
+            });
+        });
+    }
+
+});
+
+router.get('/loadUserData', function (req, res, next) {
+    var userId = req.user.id;
+
+    req.getConnection(function (err, conn) {
+       conn.query('select name, address from users where id = ?', [userId], function (err, data) {
+          res.send({name: data[0].name, address: data[0].address});
+       });
+    });
+});
+
 module.exports = router;
 
 function isLoggedin(req, res, next){
