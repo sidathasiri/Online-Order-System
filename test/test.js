@@ -15,13 +15,11 @@ describe('Getting categories', function() {
             connection.query("select name from categories where id = ?", [1], function (err, names) {
                 if(err){
                     done(err);
-                 //   connection.end();
                     return;
                 }
 
                 else{
                     assert.equal(names[0].name, "Burgers");
-               //     connection.end();
                     done();
                 }
             });

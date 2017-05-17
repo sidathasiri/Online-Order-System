@@ -130,6 +130,7 @@
                         <div class="col-md-3">
                             <input type="date" name="date" id="date" required>
                         </div>
+                        <div class="col-md-2" id="dateValidation" style="color: red; font-weight:bold; display: none"> Date not valid</div>
                     </div>
                 </div>
             </div>
@@ -155,7 +156,7 @@
                 <br>
                 <div class="col-sm-offset-4 col-sm-10">
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                    <button type="submit" class="btn btn-primary">Reserve</button>
+                    <button id="submitBtn" type="submit" class="btn btn-primary" disabled>Reserve</button>
                 </div>
         </form>
 
@@ -250,14 +251,31 @@
 
 
         $('#date').on('change', function () {
-            $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
-                $('#slots').empty();
-                $.each(data, function (index, cap) {
-                    $('#slots').append('<option value="'+cap+'">'+cap+'</option>')
-                });
+
+            $.get('/user/checkReservationDate/'+$('#date').val(), function(isValid){
+                if(!isValid){
+                    $('#dateValidation').css("display", "inline");
+                    $('#submitBtn').attr("disabled", true);
+                    $('#slots').empty();
+                }else{
+                    $('#dateValidation').css("display", "none");
+                    $('#submitBtn').removeAttr("disabled");
+
+                    $.get('/user/loadTimeSolts/'+$('#tableData').val()+'/'+$('#date').val(), function (data) {
+                        $('#slots').empty();
+                        $.each(data, function (index, cap) {
+                            $('#slots').append('<option value="'+cap+'">'+cap+'</option>')
+                        });
+                    });
+                }
             });
+
+
+
+
         });
     });
+
 
 
 </script>

@@ -3,13 +3,12 @@ var router = express.Router();
 var Cart = require('../Models/cart');
 var dateTime = require('node-datetime');
 
-/* GET home page. */
-
+//home page
 router.get('/', function (req, res, next) {
    res.render('welcome', {layout: null});
 });
 
-
+//menu page
 router.get('/menu', function(req, res, next) {
   var chunks = [];
   var successMsg = req.flash('success')[0];
@@ -24,8 +23,10 @@ router.get('/menu', function(req, res, next) {
     res.render('index', { title: 'EasyFoods', packages: chunks, successMsg: successMsg , noMessage: !successMsg});
 });
 
+//burger page
 router.get('/burgers', function (req, res, next) {
   req.getConnection(function (err, conn) {
+    //load available burgers
     conn.query('select id from categories where name = ?', ['Burgers'], function (err, id) {
       conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, burgers) {
         if(burgers){
@@ -40,8 +41,10 @@ router.get('/burgers', function (req, res, next) {
 });
 });
 
+//get snacks page
 router.get('/snacks', function (req, res, next) {
   req.getConnection(function (err, conn) {
+    //load available snacks
     conn.query('select id from categories where name = ?', ['Snacks'], function (err, id) {
       conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, snacks) {
         if(snacks){
@@ -55,8 +58,10 @@ router.get('/snacks', function (req, res, next) {
   });
 });
 
+//get dessert page
 router.get('/desserts', function (req, res, next) {
   req.getConnection(function (err, conn) {
+    //load available desserts
     conn.query('select id from categories where name = ?', ['Desserts'], function (err, id) {
       conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, desserts) {
         if(desserts){
@@ -70,7 +75,9 @@ router.get('/desserts', function (req, res, next) {
   });
 });
 
+//get beverages page
 router.get('/beverages', function (req, res, next) {
+  //load available beverages details
   req.getConnection(function (err, conn) {
     conn.query('select id from categories where name = ?', ['Beverages'], function (err, id) {
       conn.query('select * from food_items where category_id = ? and availability = ?', [id[0].id, 'available'] ,function (err, beverages) {
@@ -88,9 +95,10 @@ router.get('/beverages', function (req, res, next) {
 router.get('/add-to-cart/:id/:type', function (req,res, next) {
   var packageId = req.params.id;
   var type = req.params.type;
-  var cart = new Cart(req.session.cart ? req.session.cart: {});
+  var cart = new Cart(req.session.cart ? req.session.cart: {}); //creating  a new cart
 
   req.getConnection(function (err, conn){
+    //handle different types of food items
     if(type=='package'){
       conn.query('select * from packages where id=?', [packageId], function(err, package){
         if(err){
@@ -158,6 +166,7 @@ router.get('/add-to-cart/:id/:type', function (req,res, next) {
   });
 });
 
+//reduce items in cart by one
 router.get('/reduce/:id', function (req, res, next) {
   var packageId = req.params.id;
   var cart = new Cart(req.session.cart ? req.session.cart: {});
@@ -166,6 +175,7 @@ router.get('/reduce/:id', function (req, res, next) {
   res.redirect('/shopping-cart');
 });
 
+//remove all in cart
 router.get('/remove/:id', function (req, res, next) {
   var packageId = req.params.id;
   var cart = new Cart(req.session.cart ? req.session.cart: {});
@@ -174,6 +184,7 @@ router.get('/remove/:id', function (req, res, next) {
   res.redirect('/shopping-cart');
 });
 
+//get shopping cart
 router.get('/shopping-cart', function (req, res, next) {
   if(!req.session.cart){
     return res.render('shop/shopping-cart', { title: 'EasyFoods | Shopping Cart', packages: null});
@@ -183,7 +194,9 @@ router.get('/shopping-cart', function (req, res, next) {
   res.render('shop/shopping-cart', {packages: cart.generateArray(), totalPrice: cart.totalPrice});
 });
 
+//get checkout
 router.get('/checkout', isLoggedin,function (req, res, next) {
+  //check if shopping cart is empty
   if(!req.session.cart){
     return res.redirect('/shopping-cart');
   }
@@ -194,15 +207,18 @@ router.get('/checkout', isLoggedin,function (req, res, next) {
 });
 
 router.post('/checkout', isLoggedin,function(req, res, next){
+  //check for shopping cart
   if(!req.session.cart){
     return res.redirect('/shopping-cart');
   }
   var cart = new Cart(req.session.cart);
 
+  //require stripe
   var stripe = require("stripe")(
       "sk_test_nS8RZkm3ZkpgdU9dvgBf5UGr"
   );
 
+  //request payment
   stripe.charges.create({
     amount:  cart.totalPrice*100,
     currency: "lkr",
@@ -216,6 +232,7 @@ router.post('/checkout', isLoggedin,function(req, res, next){
     var dt = dateTime.create();
     var formatted = dt.format('Y-m-d H:M:S');
 
+    //add logs to db
     req.getConnection(function (err, conn) {
       //insert order to database
       conn.query('insert into orders (customer_id, cart,address, name, payment_id, date) values(?,?,?,?,?,?)', [req.user.id, JSON.stringify(cart),req.body.address, req.body.name, charge.id, formatted], function (err, result) {
@@ -229,6 +246,7 @@ router.post('/checkout', isLoggedin,function(req, res, next){
 
         req.session.cart = null;
 
+        //send mail notification
         var api_key = 'key-a5c0a552c662ece5f3c279eec081b3f9';
         var domain = 'sandboxbd57df4272094073a1546c209403a45b.mailgun.org';
         var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
@@ -257,6 +275,7 @@ router.post('/checkout', isLoggedin,function(req, res, next){
 
 module.exports = router;
 
+//check if user is logged in
 function isLoggedin(req, res, next){
   if(req.isAuthenticated()){
     return next();

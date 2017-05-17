@@ -8,6 +8,7 @@ var upload = multer({ dest: 'uploads/' });
 var bodyParser = require('body-parser');
 var request = require('request');
 
+//multrer configuration
 var storage = multer.diskStorage({
     destination: function(req, file, cb){
         cb(null, './public/uploads');
@@ -25,7 +26,7 @@ router.use(multer({storage: storage}).single('fileUpload'));
 var csrfProtection = csrf();
 router.use(csrfProtection);
 
-router.get('/adminDashboard', function (req, res, next) {
+router.get('/adminDashboard', isLoggedin,function (req, res, next) {
     req.getConnection(function (err, conn) {
         //get orders from database
         conn.query('select * from orders where status = ?', ['pending'],function(err, orders){
@@ -42,7 +43,7 @@ router.get('/adminDashboard', function (req, res, next) {
 
 });
 
-router.get('/deliveryDashboard', function (req, res, next) {
+router.get('/deliveryDashboard', isDeliveryLoggedin,function (req, res, next) {
     req.getConnection(function (err, conn) {
         //get orders from database
         conn.query('select * from orders where status = ?', ['pending'],function(err, orders){
@@ -60,7 +61,7 @@ router.get('/deliveryDashboard', function (req, res, next) {
 });
 
 
-router.get('/addFood', function (req, res, next) {
+router.get('/addFood', isLoggedin,function (req, res, next) {
     var names = [];
     req.getConnection(function (err, conn) {
         //load categories
@@ -76,7 +77,7 @@ router.get('/addFood', function (req, res, next) {
 
 });
 
-router.get('/setAvailableFood', function (req, res, next) {
+router.get('/setAvailableFood', isLoggedin,function (req, res, next) {
     req.getConnection(function (err, conn) {
         //load categories
        conn.query('select * from categories', function (err, names) {
@@ -89,7 +90,7 @@ router.get('/setAvailableFood', function (req, res, next) {
 
 });
 
-router.get('/myOrders', function(req, res, next){
+router.get('/myOrders', isLoggedin,function(req, res, next){
     req.getConnection(function (err, conn) {
         conn.query('select * from orders where customer_id = ?', [req.user.id], function(err, orders){
             var cart;
@@ -104,12 +105,13 @@ router.get('/myOrders', function(req, res, next){
     });
 });
 
-router.post('/addNewCategory', function (req, res, next) {
+router.post('/addNewCategory', isLoggedin,function (req, res, next) {
    var catName = req.body.categoryName;
     req.getConnection(function (err, conn) {
+        //load name from database
        conn.query('select name from categories where name = ?', [catName], function (err, result) {
           if(result.length==0){
-              //insert to cart
+              //insert to cartegories
               conn.query('insert into categories (name) values(?)', [catName], function (err, result) {
                   req.flash('addCat', 'Added Successfully');
                   res.redirect('/admin/addFood');
@@ -124,7 +126,7 @@ router.post('/addNewCategory', function (req, res, next) {
     });
 });
 
-router.post('/addNewFood',function (req, res, next) {
+router.post('/addNewFood', isLoggedin,function (req, res, next) {
     req.checkBody('itemName', 'Item name should not be empty').notEmpty();
     req.checkBody('price', 'Price is invalid').notEmpty().isNumeric();
 
@@ -139,12 +141,12 @@ router.post('/addNewFood',function (req, res, next) {
         req.flash('error', messages);
         res.redirect('/admin/addFood');
     }
-
+    //if not errors add data
     else{
         var catName = req.body.category;
         req.getConnection(function (err, conn) {
             conn.query('select id from categories where name = ?', [catName], function (err, id) {
-                //insert to database
+                //insert food item to database
                 conn.query('insert into food_items (name, price, category_id, image_path) values(?,?,?,?)', [req.body.itemName, req.body.price, id[0].id, req.file.path], function (err, result) {
                     if(err)
                         console.log(err);
@@ -157,6 +159,7 @@ router.post('/addNewFood',function (req, res, next) {
 
 router.get('/loadItems/:id', function (req, res, next) {
     var catId = req.params.id;
+    //load food_item with given id
     req.getConnection(function (err, conn) {
         conn.query('select * from food_items where category_id = ?', [catId],function (err, names) {
             res.send(names);
@@ -164,7 +167,7 @@ router.get('/loadItems/:id', function (req, res, next) {
     });
 });
 
-router.post('/update', function (req, res, next) {
+router.post('/update', isLoggedin,function (req, res, next) {
     var availability = req.body.optradio;
     var itemId = req.body.items;
     var price = req.body.price;
@@ -179,12 +182,15 @@ router.post('/update', function (req, res, next) {
 router.get('/getPrice/:id', function (req, res, next) {
    req.getConnection(function (err, conn) {
       conn.query('select price from food_items where id = ?', [req.params.id], function (err, price) {
+          //send price of given id
           res.send(price[0]);
       });
    });
 });
 
 router.get('/sendCompletedMail/:customer_id/:id', function (req, res, next) {
+
+    //setup mailgun
     var customer_id = req.params.customer_id;
     var order_id = req.params.id;
     var api_key = 'key-a5c0a552c662ece5f3c279eec081b3f9';
@@ -193,14 +199,14 @@ router.get('/sendCompletedMail/:customer_id/:id', function (req, res, next) {
 
     req.getConnection(function (err, conn) {
        conn.query('select email from users where id=?', [customer_id], function (err, email) {
-            //send mail
+            //setting up headers
            var data = {
                from: 'EasyFoods <postmaster@sandboxbd57df4272094073a1546c209403a45b.mailgun.org>',
                to: email[0].email,
                subject: 'Order is on the way',
                text: 'We just shipped your order and will reach you soon. Thanks for using our web app!'
            };
-
+                //sending mail
                mailgun.messages().send(data, function (error, body) {
                req.getConnection(function (err, conn) {
                   conn.query('update orders set status = ? where id = ?', ['finished', order_id], function (err, result) {
@@ -217,9 +223,10 @@ router.get('/sendCompletedMail/:customer_id/:id', function (req, res, next) {
 
 });
 
-router.get('/tableReservations', function (req, res,next) {
+router.get('/tableReservations', isLoggedin,function (req, res,next) {
     var reservationsArr = [];
     req.getConnection(function (err, conn) {
+        //load active reservations from db
        conn.query('select * from table_reservations where status = ?', ['active'], function (err ,reservations) {
            console.log(reservations);
           if(reservations.length>0){
@@ -256,16 +263,17 @@ router.get('/tableReservations', function (req, res,next) {
 
 });
 
-router.get('/addTable', function (req, res, next) {
+router.get('/addTable', isLoggedin,function (req, res, next) {
     var errors = req.flash('error');
     var success = req.flash('success');
    res.render('admin/addTable', {csrfToken: req.csrfToken(), errors: errors, hasValidationErrors: errors.length>0, success:success});
 });
 
-router.post('/addNewTable', function (req, res, next) {
+router.post('/addNewTable', isLoggedin,function (req, res, next) {
     req.checkBody('capacity', 'Capacity is invalid').notEmpty().isInt();
     req.checkBody('price', 'Price is invalid').notEmpty().isNumeric();
 
+    //validation for errors
     var errors = req.validationErrors();
     if(errors){
         var messages = [];
@@ -279,6 +287,7 @@ router.post('/addNewTable', function (req, res, next) {
         res.redirect('/admin/addTable');
     }
 
+    //if no error add data to db
     else{
         req.getConnection(function (err, conn) {
             conn.query('insert into tables (capacity, price, image_path) values(?,?,?)', [req.body.capacity, req.body.price, req.file.path.substr(6)], function (err, result) {
@@ -292,7 +301,9 @@ router.post('/addNewTable', function (req, res, next) {
     }
 });
 
-router.get('/report', function (req, res, next) {
+router.get('/report', isLoggedin,function (req, res, next) {
+
+    //setup reporting properties
     var data = {
         template: {'shortid': 'H1gb6hVhx', "recipe" : "phantom-pdf"},
         options: {
@@ -301,6 +312,7 @@ router.get('/report', function (req, res, next) {
         }
     }
 
+    //setting report options
     var options = {
         uri: "http://localhost:3001/api/report",
         method: 'POST',
@@ -316,7 +328,16 @@ module.exports = router;
 
 function isLoggedin(req, res, next){
     if(req.user){
-        return next();
+        if(req.user.post == 'admin')
+            return next();
+    }
+    res.redirect('/user/signin');
+}
+
+function isDeliveryLoggedin(req, res, next){
+    if(req.user){
+        if(req.user.post == 'delivery')
+            return next();
     }
     res.redirect('/user/signin');
 }

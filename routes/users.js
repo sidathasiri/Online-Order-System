@@ -8,38 +8,50 @@ var bcrypt = require('bcrypt-nodejs');
 var csrfProtection = csrf();
 router.use(csrfProtection);
 
-/* GET users listing. */
+//get signin page
 router.get('/signin', function (req, res, next) {
   var messages = req.flash('error');
-  res.render('user/signin', {title: 'EasyFoods | Signin', csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length>0});
+  //if user is logged in, redirect to profile page
+  if(req.user){
+      res.redirect('profile');
+  }
+  else{
+      res.render('user/signin', {title: 'EasyFoods | Signin', csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length>0});
+  }
 
 });
 
+//get signup page
 router.get('/signup', function(req, res, next){
   var messages = req.flash('error');
   res.render('user/signup', {title: 'EasyFoods | Signup', csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length>0});
 });
 
-router.get('/reserveTable', isLoggedin,function (req, res, next) {
+//get table reservation page
+router.get('/reserveTable', isNormalUser,function (req, res, next) {
     var reserveSuccess = req.flash('reserveSuccess');
    res.render('user/reserve-table', {title: 'EasyFoods | Reserve Table', csrfToken: req.csrfToken(), reserveSuccess: reserveSuccess});
 });
 
-router.get('/updateProfile', isLoggedin,function (req, res, next) {
+//get profile update page
+router.get('/updateProfile', isNormalUser,function (req, res, next) {
     var updateSuccess = req.flash('updateSuccess');
     var updateError = req.flash('updateError');
     res.render('user/update-profile', {title: 'EasyFoods | Update Profile', csrfToken: req.csrfToken(), updateSuccess: updateSuccess, updateError: updateError});
 });
 
+//get profile page
 router.get('/profile', isLoggedin,function (req, res, next) {
   req.getConnection(function (err, conn) {
     conn.query('select * from orders where customer_id = ?', [req.user.id], function(err, orders){
       var cart;
+      //load items to cart
       orders.forEach(function(order){
         cart = new Cart(JSON.parse(order.cart));
         order.items = cart.generateArray();
         order.cart = JSON.parse(order.cart);
       });
+      //respond to different types of users
       if(req.user.post=='customer')
         res.render('user/profile', {title: 'EasyFoods | Profile', orders: orders, name: req.user.name});
 
@@ -53,6 +65,7 @@ router.get('/profile', isLoggedin,function (req, res, next) {
 
 });
 
+//signup using passport
 router.post('/signup', passport.authenticate('local.signup', {
   failureRedirect: '/user/signup',
   failureFlash: true
@@ -68,6 +81,7 @@ router.post('/signup', passport.authenticate('local.signup', {
   }
 });
 
+//signin using passport
 router.post('/signin', passport.authenticate('local.signin', {
   failureRedirect: '/user/signin',
   failureFlash: true
@@ -94,7 +108,8 @@ router.get('/logout', isLoggedin,function (req, res, next) {
   res.redirect('/user/signin');
 });
 
-router.post('/changeEmail', function (req, res, next) {
+//change email function
+router.post('/changeEmail', isNormalUser,function (req, res, next) {
    var userId = req.user.id;
     if(req.body.email == ""){
         req.flash('updateError', 'Email should not be empty');
@@ -110,8 +125,10 @@ router.post('/changeEmail', function (req, res, next) {
     }
 });
 
-router.post('/changePassword', function (req, res, next) {
+//change password function
+router.post('/changePassword', isLoggedin,function (req, res, next) {
    var userId = req.user.id;
+   //validate data
     if(req.body.password == ""){
         req.flash('updateError', "Password should not be empty");
         res.redirect('/user/updateProfile');
@@ -132,7 +149,7 @@ router.post('/changePassword', function (req, res, next) {
 
     else{
         var salt = bcrypt.genSaltSync(10);
-        var hash = bcrypt.hashSync(req.body.password, salt);
+        var hash = bcrypt.hashSync(req.body.password, salt);    //hash password
         req.getConnection(function (err, conn) {
            conn.query('update users set password = ? where id = ?', [hash, userId], function (err, result) {
                req.flash('updateSuccess', "Passwords change successful!");
@@ -142,6 +159,7 @@ router.post('/changePassword', function (req, res, next) {
     }
 });
 
+//load distinct capacity sizes from db
 router.get('/loadCapacity', function (req, res, next) {
    req.getConnection(function (err, conn) {
      conn.query('select distinct capacity from tables order by capacity', function (err, capacities) {
@@ -154,6 +172,7 @@ router.get('/loadCapacity', function (req, res, next) {
    });
 });
 
+//load tables with specific capacity
 router.get('/loadTable/:capacity', function (req, res, next) {
    var capacity = req.params.capacity;
     req.getConnection(function (err, conn) {
@@ -167,6 +186,7 @@ router.get('/loadTable/:capacity', function (req, res, next) {
     });
 });
 
+//load price from specific item
 router.get('/loadPrice/:id', function (req, res, next) {
     var id = req.params.id;
     req.getConnection(function (err, conn) {
@@ -178,22 +198,24 @@ router.get('/loadPrice/:id', function (req, res, next) {
 
 });
 
+//get available time slots
 router.get('/loadTimeSolts/:tableId/:date', function (req, res, next) {
    var tableId = req.params.tableId;
     var timeSlotsArr = [];
     req.getConnection(function (err, conn) {
         conn.query('select time from time_slots', function (err, timeSlots) {
             timeSlots.forEach(function (timeSlot) {
-                timeSlotsArr.push(timeSlot.time);
+                timeSlotsArr.push(timeSlot.time); //add all time slots
             });
 
             var timeIdArr = [];
             req.getConnection(function (err, conn) {
                 console.log(tableId, req.params.date);
                 conn.query('select time_slot_id from table_reservations where table_id = ?  and status = ? and date = ?', [tableId, 'active', req.params.date], function (err, timeIds) {
+                    //check for active reservations
                     if(timeIds.length>0){
                         timeIds.forEach(function (id) {
-                            timeIdArr.push(id.time_slot_id);
+                            timeIdArr.push(id.time_slot_id); //load taken time_slot ids
                         });
 
                         var takenSlots = [];
@@ -201,12 +223,12 @@ router.get('/loadTimeSolts/:tableId/:date', function (req, res, next) {
                             req.getConnection(function (err, conn) {
                                 conn.query('select time from time_slots where id = ?', [id], function (err, times) {
                                     times.forEach(function (slot) {
-                                        takenSlots.push(slot.time);
+                                        takenSlots.push(slot.time); //get time for corresponding time_slot id
                                         console.log('takenSlots:'+takenSlots);
                                     });
 
                                     if(takenSlots.length==timeIds.length){
-                                        let difference = timeSlotsArr.filter(x => takenSlots.indexOf(x) == -1);
+                                        let difference = timeSlotsArr.filter(x => takenSlots.indexOf(x) == -1); //take the difference of arrays
                                         console.log(difference);
                                         res.send(difference);
                                     }
@@ -214,6 +236,7 @@ router.get('/loadTimeSolts/:tableId/:date', function (req, res, next) {
                                 });
                             });
                         });
+                        //if no active reservations
                     }else{
                         console.log('in not found results');
                         res.send(timeSlotsArr);
@@ -224,11 +247,13 @@ router.get('/loadTimeSolts/:tableId/:date', function (req, res, next) {
     });
 });
 
-router.post('/reserve', function (req, res,next) {
+//make the reservation
+router.post('/reserve', isNormalUser,function (req, res,next) {
     var time_slot = req.body.slots;
     req.getConnection(function (err, conn) {
        conn.query('select id from time_slots where time = ?', [time_slot], function (err, ids) {
            req.getConnection(function (err, conn) {
+               //create the date
                var date = new Date();
 
                var hour = date.getHours();
@@ -249,6 +274,7 @@ router.post('/reserve', function (req, res,next) {
                day = (day < 10 ? "0" : "") + day;
 
                var currentTime = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
+               //make db entry
                conn.query('insert into table_reservations (table_id, time_slot_id, user_id, status, createdOn, date) values(?,?,?,?,?,?)', [req.body.tableData, ids[0].id, req.user.id, 'active', currentTime, req.body.date]);
                req.flash('reserveSuccess', 'Reservation Successful!');
                res.redirect('/user/reserveTable');
@@ -258,7 +284,8 @@ router.post('/reserve', function (req, res,next) {
 
 });
 
-router.get('/myReservations', function (req, res, next) {
+//load user reservations
+router.get('/myReservations', isLoggedin,function (req, res, next) {
     var reservationArr = [];
     req.getConnection(function (err, conn) {
        conn.query('select * from table_reservations where user_id = ? and status = ?', [req.user.id, 'active'], function (err, reservations) {
@@ -288,7 +315,8 @@ router.get('/myReservations', function (req, res, next) {
     });
 });
 
-router.get('/cancelReservation/:id', function (req, res,next) {
+//cancel reservation function
+router.get('/cancelReservation/:id', isLoggedin,function (req, res,next) {
    var id = req.params.id;
     req.getConnection(function (err, conn) {
         conn.query('update table_reservations set status = ? where id = ?', ['finished', id], function () {
@@ -297,6 +325,7 @@ router.get('/cancelReservation/:id', function (req, res,next) {
     });
 });
 
+//load image of table
 router.get('/loadTableImage/:id', function (req, res, next) {
    var table_id = req.params.id;
     req.getConnection(function (err, conn) {
@@ -306,15 +335,17 @@ router.get('/loadTableImage/:id', function (req, res, next) {
     });
 });
 
-router.post('/changeAddress', function (req, res, next) {
+//change user address
+router.post('/changeAddress', isLoggedin,function (req, res, next) {
     var userId = req.user.id;
 
+    //validate input
     if(req.body.address == ""){
         req.flash('updateError', "Address should not be empty");
         res.redirect('/user/updateProfile');
         console.log('empty address');
     }
-
+    //no errors => make the update
     else{
         req.getConnection(function (err, conn) {
             conn.query('update users set address = ? where id = ?', [req.body.address, userId], function (err, result) {
@@ -328,6 +359,7 @@ router.post('/changeAddress', function (req, res, next) {
 
 });
 
+//load user data
 router.get('/loadUserData', function (req, res, next) {
     var userId = req.user.id;
 
@@ -338,6 +370,7 @@ router.get('/loadUserData', function (req, res, next) {
     });
 });
 
+//validate user email
 router.get('/isValidUser/:email', function (req, res, next) {
    var checkingEmail = req.params.email;
    req.getConnection(function (err, conn) {
@@ -351,11 +384,34 @@ router.get('/isValidUser/:email', function (req, res, next) {
    });
 });
 
+router.get('/checkReservationDate/:date', function (req, res, next) {
+    var enteredDate = new Date(req.params.date);
+    var currentDate = new Date();
+
+    if(currentDate.getDate()<=enteredDate.getDate() && currentDate.getMonth()<=enteredDate.getMonth()){
+        res.send(true);
+    }
+    else
+        res.send(false);
+});
+
 module.exports = router;
 
+//check if a user has logged in
 function isLoggedin(req, res, next){
   if(req.user){
     return next();
   }
   res.redirect('/user/signin');
 }
+
+//check if a customer has logged in
+function isNormalUser(req, res, next){
+    if(req.user){
+        if(req.user.post == 'customer')
+            return next();
+    }
+    res.redirect('/user/signin');
+}
+
+
